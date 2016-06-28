@@ -1,4 +1,4 @@
-oab-extension
+unified-extension
 ===============
 
 **Open Access Button Unified Extension**
