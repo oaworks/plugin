@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open Data Button</title>
+    <meta charset="UTF-8">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/oa.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h5 style="color: #F04717"><img src="../img/oa25.png">Open Access Button</h5>
+    <div id="error"></div>
+    <div id="api_content">
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                <span>Loading Content</span>
+            </div>
+        </div>
+    </div>
+    <div class="span4 collapse-group auth_email_group">
+        <input type="email" class="auth_email_group form-control collapse in" id="auth_email" placeholder="Enter author's email">
+    </div>
+    <div class="span4 collapse-group auth_email_group">
+        <input type="text" class="auth_email_group form-control collapse in" id="article_title" placeholder="Enter the article title">
+    </div>
+    <br>
+    <div class="collapse in" id="story_div">
+        <p class="large-text left">With this research I could...</p>
+        <p id="counter" class="large-text right">85</p>
+        <textarea class="form-control" rows="4" id="story" maxlength=85 placeholder="Please finish the sentence above. This will be sent to the author. e.g 'understand my disease' or 'learn more about this aspect of culture'"></textarea>
+        <p class="small-text">Your story is important to email the author, read <a href="#" id="why">why</a>.</p>
+    </div>
+    <div class="btn-group input-group" data-toggle="buttons">
+        <button type="submit" class="btn btn-default orange lrgbutton" id="submit" style="width: 100%" disabled>Send a new request</button>
+    </div>
+    <table class="table footer anchored-bottom" style="margin-bottom: 0;  text-align: center">
+        <tr>
+            <td><a href="#" id="bug">File a bug</a></td>
+            <td><a href="#" id="logout">Logout</a></td>
+        </tr>
+    </table>
+</div>
+<div id="spin-greybox">
+    <div class="spinner"></div>
+</div>
+<script type="text/javascript" src="../js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../js/oab.js"></script>
+<script type="text/javascript" src="../js/ui.js"></script>
+<script type="text/javascript" src="../lib/bootstrap.min.js"></script>
+</body>
+</html>

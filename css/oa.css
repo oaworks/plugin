@@ -1,0 +1,29 @@
+/* options page */
+
+.form_input {
+    width: 100%;
+    min-width: 200px;
+}
+
+.opt_hint {
+    margin-top: 2px;
+}
+
+.button_div{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+div #auth_feedback {
+    flex: 4 0 0;
+}
+
+button #submit_auth{
+    flex: 1 0 0;
+}
+
+label{
+    margin-bottom: 5px;
+}

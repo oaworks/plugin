@@ -1,0 +1,24 @@
+{
+  "name": "OAB Unified",
+  "version": "0.0.1",
+  "version_name": "oab_unified_0.0.1",
+  "manifest_version": 2,
+  "description": "Push Button. Get Research. Make Progress.",
+  "icons": { "128": "img/oa128.png" },
+  "browser_action": {
+    "default_title": "OA Button",
+    "default_icon": "img/oa128.png",
+    "default_popup": "html/main.html"
+  },
+  "options_ui": {
+    "page": "html/auth.html",
+    "chrome_style": true
+  },
+  "permissions": [
+    "tabs",
+    "http://*/*",
+    "https://*/*",
+    "storage",
+    "geolocation"
+  ]
+}
