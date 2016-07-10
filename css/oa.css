@@ -9,7 +9,7 @@
     margin-top: 2px;
 }
 
-.button_div{
+.button_div {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -20,10 +20,10 @@ div #auth_feedback {
     flex: 4 0 0;
 }
 
-button #submit_auth{
+button #submit_auth {
     flex: 1 0 0;
 }
 
-label{
+label {
     margin-bottom: 5px;
 }
