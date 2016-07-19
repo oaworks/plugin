@@ -1,4 +1,5 @@
-var apiaddress = 'https://api.opendatabutton.org';
+//var apiaddress = 'https://api.opendatabutton.org';
+var apiaddress = 'https://dev.api.cottagelabs.com/service/oabutton';
 var siteaddress = 'https://openaccessbutton.org';
 
 var oab = {
@@ -9,10 +10,10 @@ var oab = {
     // Tell the API which plugin version is in use for each POST
     plugin_version_sign: function(pdata) {
         var manifest = chrome.runtime.getManifest();
-        return $.extend(pdata, { plugin: manifest['version_name'], type: 'article' } );
+        return $.extend(pdata, { plugin: manifest['version_name'], type: 'article', test: true } ); // fixme: debug flag
     },
 
-    api_request: function(request_type, data, requestor, success_callback, failure_callback) {
+    api_request: function(request_type, data, success_callback, failure_callback) {
         $.ajax({
             'type': 'POST',
             'url': apiaddress + request_type,
@@ -22,7 +23,7 @@ var oab = {
             'cache': false,
             'data': JSON.stringify(this.plugin_version_sign(data)),
             'success': function(data){
-                success_callback(data['data'], requestor)
+                success_callback(data['data'])
             },
             'error': function(data) {
                 failure_callback(data)
@@ -32,14 +33,14 @@ var oab = {
     },
 
     handle_api_error: function (data, displayFunction) {               // todo: check for more errors
-    var error_text = '';
-    if (data.status == 401) {
-        error_text = "Unauthorised - check your API key is valid."
-    } else if (data.status == 403) {
-        error_text = "Forbidden - account may already exist."
+        var error_text = '';
+        if (data.status == 401) {
+            error_text = "Unauthorised - check your API key is valid."
+        } else if (data.status == 403) {
+            error_text = "Forbidden - account may already exist."
+        }
+        if (error_text != '') {
+            displayFunction(error_text);
+        }
     }
-    if (error_text != '') {
-        displayFunction(error_text);
-    }
-}
 };

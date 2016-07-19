@@ -9,10 +9,10 @@ function do_auth() {
         
         // Check the API Key is valid
         var api_request = '/blocked';
-        data = {
+        var data = {
             'api_key': key
         };
-        oab.api_request(api_request, data, 'accounts', function(resp) {
+        oab.api_request(api_request, data, function(resp) {
 
             //  success, Save the credentials to storage
             save_auth(key, function() {

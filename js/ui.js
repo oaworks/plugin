@@ -1,4 +1,4 @@
-var key = localStorage.getItem('api_key');
+var key = undefined;
 var active_tab = undefined;
 
 // These listeners are active on all pages
@@ -11,8 +11,11 @@ window.addEventListener('load', function () {
         }
     });
     document.getElementById('logout').addEventListener('click', function () {
+        /*
         if ('api_key' in localStorage) localStorage.removeItem('api_key');
         openOptions();
+        */
+        chrome.storage.local.remove('api_key', openOptions)
     });
 });
 
@@ -59,7 +62,7 @@ function fill_email_fields(author_email, article_title) {
     }
 }
 
-function set_button(button_text, button_target, post_story) {
+function set_button(id, button_text, button_target, post_story) {
     //fixme: this could be much more efficient!
     var button = $('#submit');
     button.text(button_text);
@@ -67,7 +70,7 @@ function set_button(button_text, button_target, post_story) {
     if (button_target && post_story) { // story and redirect, redirect after post made
         button.click(function() {
             document.getElementById('spin-greybox').style.visibility = 'visible';
-            post_block_event(localStorage.getItem('blocked_id'), function () {
+            post_block_event(id, function () {
                 chrome.tabs.create({url: button_target});
                 var pp = chrome.extension.getViews({type: 'popup'})[0];
                 pp.close();
@@ -80,7 +83,7 @@ function set_button(button_text, button_target, post_story) {
                 display_error("Please complete all fields!")
             } else {
                 document.getElementById('spin-greybox').style.visibility = 'visible';
-                post_block_event(localStorage.getItem('blocked_id'), function () {
+                post_block_event(id, function () {
                     var pp = chrome.extension.getViews({type: 'popup'})[0];
                     pp.close();
                 });
@@ -102,26 +105,26 @@ function openOptions() {
     }
 }
 
-function handle_data(data) {
+function handle_data(recvData) {
     var api_div = document.getElementById('api_content');
 
-    if (data.hasOwnProperty('provided')) {
+    if (recvData.hasOwnProperty('provided')) {
         // we have found the article; send the user to its url
         hide_email_fields();
         $('#story_div').collapse('hide');
         document.getElementById('submit').disabled = false;
 
         api_div.innerHTML = '<h4 class="title">We found this article!</h4>';
-        set_button("See your article", data.provided.url, false);
-    } else if (data.hasOwnProperty('request')) {
+        set_button(recvData._id, "See your article", recvData.provided.url, false);
+    } else if (recvData.hasOwnProperty('request')) {
         // submit user story and redirect to request URL (add story to existing request)
         hide_email_fields();
         api_div.innerHTML = '<h5 class="title">We\'ve found an existing request. Add your story to support this request.</h5>';
-        set_button("Submit and view request", siteaddress + "/request/" + data.request, true);
+        set_button(recvData._id, "Submit and view request", siteaddress + "/request/" + recvData.request, true);
     } else {
         // submit user story with email and title fields (create new request)
         api_div.innerHTML = '<h4 class="title">This article isn\'t available.</h4><p>You can submit a request to the author.</p>';
-        set_button("Send a new request", undefined, true);
+        set_button(recvData._id, "Send a new request", undefined, true);
 
         // Extract more metadata from the page to augment the blocked request FIXME: This is a strange way of doing it.
         chrome.runtime.onMessage.addListener(
@@ -134,8 +137,8 @@ function handle_data(data) {
                 var journal = oab.return_journal(meta);
                 fill_email_fields(undefined, title);                // fixme: we can't reliably scrape emails yet
 
-                var block_request = '/blocked/' + localStorage.getItem('blocked_id');
-                var data = {             // This is best-case (assume getting all info) for now.
+                var block_request = '/blocked/' + recvData._id;
+                var sendData = {             // This is best-case (assume getting all info) for now.
                     'api_key': key,
                     'url': active_tab,
                     'metadata': {
@@ -145,7 +148,7 @@ function handle_data(data) {
                         'identifier': [{'type': 'doi', 'id': doi}]
                     }
                 };
-                oab.api_request(block_request, data, 'blockpost', process_api_response, oab.handle_api_error);
+                oab.api_request(block_request, sendData, handle_data, oab.handle_api_error);
             });
 
         // Now inject a script onto the page
@@ -165,6 +168,7 @@ function post_block_event(blockid, callback) {
         url: active_tab,
         story: story_text
     };
+    
     // Add author email if provided so oabutton can email them //todo: parse from page & populate field
     var given_auth_email = document.getElementById('auth_email').value;
     if (given_auth_email) {
@@ -177,82 +181,53 @@ function post_block_event(blockid, callback) {
             if (pos_obj) {
                 data['location'] = pos_obj;
             }
-            oab.api_request(block_request, data, 'blockpost', process_api_response, oab.handle_api_error);
+            oab.api_request(block_request, data, handle_data, oab.handle_api_error);
             callback()
         });
     } catch (e) {
         console.log("A location error has occurred.");
-        oab.api_request(block_request, data, 'blockpost', process_api_response, oab.handle_api_error);
+        oab.api_request(block_request, data, handle_data, oab.handle_api_error);
         callback()
     }
 }
 
-function process_api_response(data, requestor) {
-    if (requestor == 'accounts') {
-        if (data.apikey) {
-            localStorage.setItem('api_key', data.apikey);
-            localStorage.setItem('username', document.getElementById('user_email').value);
-            window.location.href = 'login.html'
-        }
-    } else if (requestor == 'blocked') {
-        localStorage.setItem('blocked_id', data._id);
-        handle_data(data);
-    }
-}
-
-
-if (key) {
-    window.addEventListener('load', function () {
-        document.getElementById('spin-greybox').style.visibility = 'hidden';
-        
-        document.getElementById('why').addEventListener('click', function () {
-            chrome.tabs.create({'url': "https://openaccessbutton.org/why"});
-        });
-
-        chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-            // Blocked Event, if we've not already sent a block event.
-            var blocked_request = '/blocked';
-
-            active_tab = tabs[0].url;
-            status_data = {
-                'api_key': key,
-                'url': active_tab
-            },
-                oab.api_request(blocked_request, status_data, 'blocked', process_api_response, oab.handle_api_error);
-        });
-
-        $('#story').keyup(function () {
-            var left = 85 - $(this).val().length;
-            if (left < 0) {
-                left = 0;
-            }
-            $('#counter').text(left);
-            var submit_btn = document.getElementById('submit');
-            if (left < 85) {
-                submit_btn.disabled = false;
-            } else {
-                submit_btn.disabled = true;
-            }
-        });
-    });
-} else {
-    openOptions()
-}
-
-// oab.handle the login button.
-document.getElementById('login').addEventListener('click', function () {
-    var user_key = document.getElementById('user_key').value;
-
-    if (user_key) {
-        var api_request = '/blocked';
-        data = {
-            'api_key': user_key
-        };
-        oab.api_request(api_request, data, 'accounts', function() {
-            localStorage.setItem('api_key', user_key);
-            window.location.href="login.html";
-        }, oab.handle_api_error);
+chrome.storage.local.get({api_key : ''}, function(items) {
+    if (items.api_key == '') {
+        openOptions();
     } else {
-        display_error('You must supply an API key to authenticate.');
+        key = items.api_key;
+        window.addEventListener('load', function () {
+            document.getElementById('spin-greybox').style.visibility = 'hidden';
+
+            document.getElementById('why').addEventListener('click', function () {
+                chrome.tabs.create({'url': "https://openaccessbutton.org/why"});
+            });
+
+            chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+                // Blocked Event, if we've not already sent a block event.
+                var blocked_request = '/blocked';
+
+                active_tab = tabs[0].url;
+                var status_data = {
+                    'api_key': items.api_key,
+                    'url': active_tab
+                };
+                oab.api_request(blocked_request, status_data, handle_data, oab.handle_api_error);
+            });
+
+            $('#story').keyup(function () {
+                var left = 85 - $(this).val().length;
+                if (left < 0) {
+                    left = 0;
+                }
+                $('#counter').text(left);
+                var submit_btn = document.getElementById('submit');
+                if (left < 85) {
+                    submit_btn.disabled = false;
+                } else {
+                    submit_btn.disabled = true;
+                }
+            });
+        });
     }
 });
