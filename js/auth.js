@@ -8,11 +8,7 @@ function do_auth() {
         var status = document.getElementById('auth_feedback');
         
         // Check the API Key is valid
-        var api_request = '/blocked';
-        var data = {
-            'api_key': key
-        };
-        oab.api_request(api_request, data, function(resp) {
+        oab.auth_query(key, function(resp) {
 
             //  success, Save the credentials to storage
             save_auth(key, function() {
@@ -21,12 +17,11 @@ function do_auth() {
                 setTimeout(function() {
                     window.close();
                 }, 2000);
-                chrome.runtime.sendMessage({key_verified: true});
             });
 
         }, function(resp) {
             // auth failure, tell the user
-            status.textContent = 'Error: credentials could not be verified';
+            status.textContent = 'Error: API Key could not be verified';
 
             var oldcolour = status.style.color;
             status.style.color = "red";
@@ -58,5 +53,13 @@ function restore_auth() {
     });
 }
 
+// When the window opens, restore the stored API Key
 document.addEventListener('DOMContentLoaded', restore_auth);
+
+// When the submit button is clicked, perform the auth steps
 document.getElementById('submit_auth').addEventListener('click', do_auth);
+
+// When the link to create an account is clicked, open a tab for it.
+document.getElementById('register').addEventListener('click', function () {
+    chrome.tabs.create({'url': oab.register_address});
+});

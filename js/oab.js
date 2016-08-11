@@ -1,35 +1,61 @@
-//var apiaddress = 'https://api.opendatabutton.org';
-var apiaddress = 'https://dev.api.cottagelabs.com/service/oabutton';
-var siteaddress = 'https://openaccessbutton.org';
+/* Using the OAB API */
 
 var oab = {
-    ///////////////////////////////////
-    // Using the oab api
-    ///////////////////////////////////
+
+    debug : true,
+
+    api_address : 'https://dev.api.cottagelabs.com/service/oab',                //'https://api.opendatabutton.org',
+
+    site_address : 'https://openaccessbutton.org',
+
+    register_address : 'https://openaccessbutton.org/login',
 
     // Tell the API which plugin version is in use for each POST
     plugin_version_sign: function(pdata) {
+        // Add the debug key if turned on
         var manifest = chrome.runtime.getManifest();
-        return $.extend(pdata, { plugin: manifest['version_name'], type: 'article', test: true } ); // fixme: debug flag
+        var signed_post = $.extend(pdata, { plugin: manifest['version_name'] } );
+
+        if (oab.debug) {
+            return $.extend(signed_post, { test: true })
+        } else {
+            return signed_post
+        }
     },
 
-    api_request: function(request_type, data, success_callback, failure_callback) {
+    auth_query: function(api_key, success_callback, failure_callback) {
+        oab.api_post('', api_key, {}, success_callback, failure_callback)
+    },
+
+    availability_query: function(api_key, url, success_callback, failure_callback) {
+        oab.api_post('/availability', api_key, { url: url }, success_callback, failure_callback)
+    },
+
+    request_post: function(api_key, request_id, data, success_callback, failure_callback) {
+        oab.api_post('/request/' + request_id, api_key, data, success_callback, failure_callback)
+    },
+
+    api_post: function(request_type, api_key, data, success_callback, failure_callback) {
         $.ajax({
             'type': 'POST',
-            'url': apiaddress + request_type,
+            'url': oab.api_address + request_type,
             'contentType': 'application/json; charset=utf-8',
-            'dataType': 'JSON',
+            beforeSend: function (request)
+            {
+                request.setRequestHeader("x-apikey", api_key);
+            },
+            'dataType': 'json',
             'processData': false,
             'cache': false,
             'data': JSON.stringify(this.plugin_version_sign(data)),
-            'success': function(data){
-                success_callback(data['data'])
+            'success': function(response){
+                success_callback(response)
             },
-            'error': function(data) {
-                failure_callback(data)
+            'error': function(response) {
+                failure_callback(response)
             }
         });
-        console.log(request_type + JSON.stringify(data));
+        oab.debugLog(request_type + JSON.stringify(data));
     },
 
     handle_api_error: function (data, displayFunction) {               // todo: check for more errors
@@ -41,6 +67,12 @@ var oab = {
         }
         if (error_text != '') {
             displayFunction(error_text);
+        }
+    },
+
+    debugLog : function(message) {
+        if (oab.debug) {
+            console.log(message)
         }
     }
 };

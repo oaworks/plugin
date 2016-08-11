@@ -1,23 +1,12 @@
-var key = undefined;
-var active_tab = undefined;
+var api_key = undefined;
 
-// These listeners are active on all pages
-window.addEventListener('load', function () {
-    document.getElementById('bug').addEventListener('click', function () {
-        if (chrome.runtime.getManifest()['version_name'].indexOf('firefox') >= 0) {
-            chrome.tabs.create({'url': "https://openaccessbutton.org/firefox/bug"});
-        } else {
-            chrome.tabs.create({'url': "https://openaccessbutton.org/chrome/bug"});
-        }
-    });
-    document.getElementById('logout').addEventListener('click', function () {
-        /*
-        if ('api_key' in localStorage) localStorage.removeItem('api_key');
-        openOptions();
-        */
-        chrome.storage.local.remove('api_key', openOptions)
-    });
-});
+function get_key() {
+    return api_key
+}
+
+function set_key(key) {
+    api_key = key;
+}
 
 function get_loc(callback) {
     if (navigator.geolocation) {
@@ -43,22 +32,12 @@ function display_error(warning) {
     warn_div.firstChild.textContent = warning;
 }
 
-function hide_email_fields() {
-    var em = $('#auth_email');
-    var ti = $('#article_title');
-    em.collapse('hide');
-    ti.collapse('hide');
-}
-
-function fill_email_fields(author_email, article_title) {
-    var em = $('#auth_email');
-    var ti = $('#article_title');
-    // pre-fill the text fields with supplied data if available
-    if (author_email) {
-        em.val(author_email);
-    }
-    if (article_title) {
-        ti.val(article_title);
+function openOptions() {
+    if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+    } else {
+        // Reasonable fallback.
+        window.open(chrome.runtime.getURL('auth.html'));
     }
 }
 
@@ -70,7 +49,7 @@ function set_button(id, button_text, button_target, post_story) {
     if (button_target && post_story) { // story and redirect, redirect after post made
         button.click(function() {
             document.getElementById('spin-greybox').style.visibility = 'visible';
-            post_block_event(id, function () {
+            send_story(id, function () {
                 chrome.tabs.create({url: button_target});
                 var pp = chrome.extension.getViews({type: 'popup'})[0];
                 pp.close();
@@ -83,7 +62,7 @@ function set_button(id, button_text, button_target, post_story) {
                 display_error("Please complete all fields!")
             } else {
                 document.getElementById('spin-greybox').style.visibility = 'visible';
-                post_block_event(id, function () {
+                send_story(id, function () {
                     var pp = chrome.extension.getViews({type: 'popup'})[0];
                     pp.close();
                 });
@@ -96,138 +75,85 @@ function set_button(id, button_text, button_target, post_story) {
     }
 }
 
-function openOptions() {
-    if (chrome.runtime.openOptionsPage) {
-        chrome.runtime.openOptionsPage();
-    } else {
-        // Reasonable fallback.
-        window.open(chrome.runtime.getURL('options.html'));
-    }
-}
+function send_story(request_id, callback) {
 
-function handle_data(recvData) {
-    var api_div = document.getElementById('api_content');
-
-    if (recvData.hasOwnProperty('provided')) {
-        // we have found the article; send the user to its url
-        hide_email_fields();
-        $('#story_div').collapse('hide');
-        document.getElementById('submit').disabled = false;
-
-        api_div.innerHTML = '<h4 class="title">We found this article!</h4>';
-        set_button(recvData._id, "See your article", recvData.provided.url, false);
-    } else if (recvData.hasOwnProperty('request')) {
-        // submit user story and redirect to request URL (add story to existing request)
-        hide_email_fields();
-        api_div.innerHTML = '<h5 class="title">We\'ve found an existing request. Add your story to support this request.</h5>';
-        set_button(recvData._id, "Submit and view request", siteaddress + "/request/" + recvData.request, true);
-    } else {
-        // submit user story with email and title fields (create new request)
-        api_div.innerHTML = '<h4 class="title">This article isn\'t available.</h4><p>You can submit a request to the author.</p>';
-        set_button(recvData._id, "Send a new request", undefined, true);
-
-        // Extract more metadata from the page to augment the blocked request FIXME: This is a strange way of doing it.
-        chrome.runtime.onMessage.addListener(
-            function (request, sender, sendResponse) {
-                var doc = (new DOMParser()).parseFromString(request.content, "text/html");
-                var meta = doc.getElementsByTagName('meta');
-                var title = oab.return_title(meta);
-                var doi = oab.return_doi(meta);
-                var author = oab.return_authors(meta);
-                var journal = oab.return_journal(meta);
-                fill_email_fields(undefined, title);                // fixme: we can't reliably scrape emails yet
-
-                var block_request = '/blocked/' + recvData._id;
-                var sendData = {             // This is best-case (assume getting all info) for now.
-                    'api_key': key,
-                    'url': active_tab,
-                    'metadata': {
-                        'title': title,
-                        'author': author,
-                        'journal': journal,
-                        'identifier': [{'type': 'doi', 'id': doi}]
-                    }
-                };
-                oab.api_request(block_request, sendData, handle_data, oab.handle_api_error);
-            });
-
-        // Now inject a script onto the page
-        chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-            chrome.tabs.executeScript(tabs[0].id, {
-                code: "chrome.runtime.sendMessage({content: document.head.innerHTML}, function(response) { console.log('success'); });"
-            });
-        });
-    }
-}
-
-function post_block_event(blockid, callback) {
-    var story_text = document.getElementById('story').value;
-    var block_request = '/blocked/' + blockid;
+    // The data is the story from the page, plus the type they are interested in
     var data = {
-        api_key: key,
-        url: active_tab,
-        story: story_text
+        story: $('#story').value
+        // types:
     };
-    
-    // Add author email if provided so oabutton can email them //todo: parse from page & populate field
-    var given_auth_email = document.getElementById('auth_email').value;
-    if (given_auth_email) {
-        data['email'] = [given_auth_email];
-    }
 
     try {
-        // Add location data to story if possible
+        // Add location to data if possible
         get_loc(function (pos_obj) {
             if (pos_obj) {
                 data['location'] = pos_obj;
             }
-            oab.api_request(block_request, data, handle_data, oab.handle_api_error);
+            oab.request_post(get_key(), request_id, data, handle_request_response, oab.handle_api_error);
             callback()
         });
     } catch (e) {
-        console.log("A location error has occurred.");
-        oab.api_request(block_request, data, handle_data, oab.handle_api_error);
+        oab.debugLog("A location error has occurred.");
+        oab.request_post(get_key(), request_id, data, handle_request_response, oab.handle_api_error);
         callback()
     }
 }
 
+function handle_availability_response(response) {
+    // The main extension logic - do different things depending on what the API returns about URL's status
+}
+
+function handle_request_response(response) {
+    // Take care of what we get back when we update a request
+}
+
 chrome.storage.local.get({api_key : ''}, function(items) {
     if (items.api_key == '') {
+        // If there is no API Key available, prompt the user to add one via the options
         openOptions();
     } else {
-        key = items.api_key;
-        window.addEventListener('load', function () {
-            document.getElementById('spin-greybox').style.visibility = 'hidden';
+        // Otherwise, we can check the status of the current tab's URL
+        set_key(items.api_key);
 
-            document.getElementById('why').addEventListener('click', function () {
-                chrome.tabs.create({'url': "https://openaccessbutton.org/why"});
-            });
+        chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
 
-            chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-                // Blocked Event, if we've not already sent a block event.
-                var blocked_request = '/blocked';
+            // Get the URL for the current tab
+            var active_tab = tabs[0].url;
 
-                active_tab = tabs[0].url;
-                var status_data = {
-                    'api_key': items.api_key,
-                    'url': active_tab
-                };
-                oab.api_request(blocked_request, status_data, handle_data, oab.handle_api_error);
-            });
+            // Check the status of this URL
+            oab.availability_query(get_key(), active_tab, handle_availability_response, oab.handle_api_error);
+        }); //todo: why not chrome.tabs.getCurrent?
 
-            $('#story').keyup(function () {
-                var left = 85 - $(this).val().length;
-                if (left < 0) {
-                    left = 0;
-                }
-                $('#counter').text(left);
-                var submit_btn = document.getElementById('submit');
-                if (left < 85) {
-                    submit_btn.disabled = false;
-                } else {
-                    submit_btn.disabled = true;
-                }
-            });
+        // Set up listeners for links and the story box
+
+        $('#spin-greybox').style.visibility = 'hidden';
+
+        $('#why').addEventListener('click', function () {
+            chrome.tabs.create({'url': "https://openaccessbutton.org/why"});
+        });
+
+        $('#bug').addEventListener('click', function () {
+            if (chrome.runtime.getManifest()['version_name'].indexOf('firefox') >= 0) {
+                chrome.tabs.create({'url': "https://openaccessbutton.org/firefox/bug"});
+            } else {
+                chrome.tabs.create({'url': "https://openaccessbutton.org/chrome/bug"});
+            }
+        });
+
+        $('#logout').addEventListener('click', function () {
+            chrome.storage.local.remove('api_key', openOptions)
+        });
+
+        $('#story').keyup(function () {
+            var left = 85 - $(this).val().length;
+            if (left < 0) {
+                left = 0;
+            }
+            $('#counter').text(left);
+            var submit_btn = document.getElementById('submit');
+
+            // the submit button is enabled when there are characters in the story box
+            submit_btn.disabled = !(left < 85);
         });
     }
 });
