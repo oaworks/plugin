@@ -55,7 +55,7 @@ var oab = {
                 failure_callback(response)
             }
         });
-        oab.debugLog(request_type + JSON.stringify(data));
+        oab.debugLog('POST to ' + request_type + ' ' + JSON.stringify(data));
     },
 
     handle_api_error: function (data, displayFunction) {               // todo: check for more errors

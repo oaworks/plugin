@@ -16,12 +16,12 @@ function get_loc(callback) {
             callback(lat_lon)
         }, function (error) {
             // Can't get location (permission denied or timed out)
-            console.log(error.message);
+            oab.debugLog(error.message);
             callback(null);
         }, opts);
     } else {
         // Browser does not support location
-        console.log('GeoLocation is unsupported.');
+        oab.debugLog('GeoLocation is unsupported.');
         callback(null)
     }
 }
@@ -48,7 +48,7 @@ function set_button(id, button_text, button_target, post_story) {
 
     if (button_target && post_story) { // story and redirect, redirect after post made
         button.click(function() {
-            document.getElementById('spin-greybox').style.visibility = 'visible';
+            $('#spin-greybox').visible = true;
             send_story(id, function () {
                 chrome.tabs.create({url: button_target});
                 var pp = chrome.extension.getViews({type: 'popup'})[0];
@@ -61,7 +61,7 @@ function set_button(id, button_text, button_target, post_story) {
             if (document.getElementById('auth_email').value || !document.getElementById('article_title').value) {
                 display_error("Please complete all fields!")
             } else {
-                document.getElementById('spin-greybox').style.visibility = 'visible';
+                $('#spin-greybox').visible = true;
                 send_story(id, function () {
                     var pp = chrome.extension.getViews({type: 'popup'})[0];
                     pp.close();
@@ -126,13 +126,13 @@ chrome.storage.local.get({api_key : ''}, function(items) {
 
         // Set up listeners for links and the story box
 
-        $('#spin-greybox').style.visibility = 'hidden';
+        $('#spin-greybox').visible = false;
 
-        $('#why').addEventListener('click', function () {
+        $('#why').click(function () {
             chrome.tabs.create({'url': "https://openaccessbutton.org/why"});
         });
 
-        $('#bug').addEventListener('click', function () {
+        $('#bug').click(function () {
             if (chrome.runtime.getManifest()['version_name'].indexOf('firefox') >= 0) {
                 chrome.tabs.create({'url': "https://openaccessbutton.org/firefox/bug"});
             } else {
@@ -140,7 +140,7 @@ chrome.storage.local.get({api_key : ''}, function(items) {
             }
         });
 
-        $('#logout').addEventListener('click', function () {
+        $('#logout').click(function () {
             chrome.storage.local.remove('api_key', openOptions)
         });
 
@@ -150,10 +150,9 @@ chrome.storage.local.get({api_key : ''}, function(items) {
                 left = 0;
             }
             $('#counter').text(left);
-            var submit_btn = document.getElementById('submit');
 
             // the submit button is enabled when there are characters in the story box
-            submit_btn.disabled = !(left < 85);
+            $('#submit').enabled = (left < 85);
         });
     }
 });
