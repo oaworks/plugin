@@ -1,14 +1,14 @@
 var api_key = undefined;
 
-function get_key() {
+function getKey() {
     return api_key
 }
 
-function set_key(key) {
+function setKey(key) {
     api_key = key;
 }
 
-function get_loc(callback) {
+function getLoc(callback) {
     if (navigator.geolocation) {
         var opts = {timeout: 5000};        // 5 sec timeout
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -26,7 +26,7 @@ function get_loc(callback) {
     }
 }
 
-function display_error(warning) {
+function displayError(warning) {
     var warn_div = document.getElementById('error');
     warn_div.innerHTML = '<div class="alert alert-danger med-text" role="alert"></div>';
     warn_div.firstChild.textContent = warning;
@@ -41,15 +41,14 @@ function openOptions() {
     }
 }
 
-function set_button(id, button_text, button_target, post_story) {
-    //fixme: this could be much more efficient!
+function setButton(request_id, button_text, button_target, post_story) {
     var button = $('#submit');
     button.text(button_text);
 
     if (button_target && post_story) { // story and redirect, redirect after post made
         button.click(function() {
             $('#spin-greybox').visible = true;
-            send_story(id, function () {
+            sendStory(id, function () {
                 chrome.tabs.create({url: button_target});
                 var pp = chrome.extension.getViews({type: 'popup'})[0];
                 pp.close();
@@ -57,16 +56,11 @@ function set_button(id, button_text, button_target, post_story) {
         });
     } else if (post_story) { // story only; we need to tell the popup to close once it is sent
         button.click(function () {
-            // check we have an email before sending    //fixme: this should really be done by not activating the button
-            if (document.getElementById('auth_email').value || !document.getElementById('article_title').value) {
-                display_error("Please complete all fields!")
-            } else {
-                $('#spin-greybox').visible = true;
-                send_story(id, function () {
-                    var pp = chrome.extension.getViews({type: 'popup'})[0];
-                    pp.close();
-                });
-            }
+            $('#spin-greybox').visible = true;
+            sendStory(id, function () {
+                var pp = chrome.extension.getViews({type: 'popup'})[0];
+                pp.close();
+            });
         });
     } else if (button_target) { // target only, just open tab when button is clicked
         button.click(function() {
@@ -75,35 +69,70 @@ function set_button(id, button_text, button_target, post_story) {
     }
 }
 
-function send_story(request_id, callback) {
+function injectCheckbox(item) {
+    $('#dynamic_content').children('form').append(item.type + ' <input type="checkbox" name="' + item.type + '" value="' + item.type + '"><br>');
+}
+
+function sendStory(request_id, callback) {
 
     // The data is the story from the page, plus the type they are interested in
     var data = {
         story: $('#story').value
-        // types:
+        // types: list of types requested from the checkboxes
     };
 
     try {
         // Add location to data if possible
-        get_loc(function (pos_obj) {
+        getLoc(function (pos_obj) {
             if (pos_obj) {
                 data['location'] = pos_obj;
             }
-            oab.request_post(get_key(), request_id, data, handle_request_response, oab.handle_api_error);
+            oab.sendRequestPost(getKey(), request_id, data, handleRequestResponse, oab.handleAPIError);
             callback()
         });
     } catch (e) {
         oab.debugLog("A location error has occurred.");
-        oab.request_post(get_key(), request_id, data, handle_request_response, oab.handle_api_error);
+        oab.sendRequestPost(getKey(), request_id, data, handleRequestResponse, oab.handleAPIError);
         callback()
     }
 }
 
-function handle_availability_response(response) {
+function handleAvailabilityResponse(response) {
     // The main extension logic - do different things depending on what the API returns about URL's status
+    oab.debugLog('API response: ' + JSON.stringify(response.data));
+
+    // Display the UI for the types that we can request
+    if (response.data.availability.length > 0) {
+        for (var availability_entry of response.data.availability) {
+            // Show that this information is available
+        }
+    } else if (response.data.requests.length > 0) {
+        for (var requests_entry of response.data.requests) {
+            if (requests_entry.usupport) {
+                // The user has supported the request
+                break;
+            }
+            if (requests_entry.ucreated) {
+                // The user created this request
+                break;
+            }
+
+            // Otherwise, we ask for support for the request
+            injectCheckbox(requests_entry);
+        }
+    } else if (response.data.accepts.length > 0) {
+        $('#dynamic_content').append('Create a new request: what type of content would you like? <br><form></form>');
+        for (var accepts_entry of response.data.accepts) {
+            injectCheckbox(accepts_entry);
+        }
+        $('#story_div').collapse(false);
+    } else {
+        oab.debugLog("The API sent a misshapen response to our availability request.");
+        displayError("Sorry, something went wrong with the API.")
+    }
 }
 
-function handle_request_response(response) {
+function handleRequestResponse(response) {
     // Take care of what we get back when we update a request
 }
 
@@ -113,16 +142,13 @@ chrome.storage.local.get({api_key : ''}, function(items) {
         openOptions();
     } else {
         // Otherwise, we can check the status of the current tab's URL
-        set_key(items.api_key);
+        setKey(items.api_key);
 
         chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
 
-            // Get the URL for the current tab
-            var active_tab = tabs[0].url;
-
-            // Check the status of this URL
-            oab.availability_query(get_key(), active_tab, handle_availability_response, oab.handle_api_error);
-        }); //todo: why not chrome.tabs.getCurrent?
+            // Check the status of the URL for the current tab
+            oab.sendAvailabilityQuery(getKey(), tabs[0].url, handleAvailabilityResponse, oab.handleAPIError);
+        });
 
         // Set up listeners for links and the story box
 

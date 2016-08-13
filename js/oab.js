@@ -11,7 +11,7 @@ var oab = {
     register_address : 'https://openaccessbutton.org/login',
 
     // Tell the API which plugin version is in use for each POST
-    plugin_version_sign: function(pdata) {
+    signPluginVersion: function(pdata) {
         // Add the debug key if turned on
         var manifest = chrome.runtime.getManifest();
         var signed_post = $.extend(pdata, { plugin: manifest['version_name'] } );
@@ -23,19 +23,19 @@ var oab = {
         }
     },
 
-    auth_query: function(api_key, success_callback, failure_callback) {
-        oab.api_post('', api_key, {}, success_callback, failure_callback)
+    sendAuthQuery: function(api_key, success_callback, failure_callback) {
+        oab.postToAPI('', api_key, {}, success_callback, failure_callback)
     },
 
-    availability_query: function(api_key, url, success_callback, failure_callback) {
-        oab.api_post('/availability', api_key, { url: url }, success_callback, failure_callback)
+    sendAvailabilityQuery: function(api_key, url, success_callback, failure_callback) {
+        oab.postToAPI('/availability', api_key, { url: url }, success_callback, failure_callback)
     },
 
-    request_post: function(api_key, request_id, data, success_callback, failure_callback) {
-        oab.api_post('/request/' + request_id, api_key, data, success_callback, failure_callback)
+    sendRequestPost: function(api_key, request_id, data, success_callback, failure_callback) {
+        oab.postToAPI('/request/' + request_id, api_key, data, success_callback, failure_callback)
     },
 
-    api_post: function(request_type, api_key, data, success_callback, failure_callback) {
+    postToAPI: function(request_type, api_key, data, success_callback, failure_callback) {
         $.ajax({
             'type': 'POST',
             'url': oab.api_address + request_type,
@@ -47,7 +47,7 @@ var oab = {
             'dataType': 'json',
             'processData': false,
             'cache': false,
-            'data': JSON.stringify(this.plugin_version_sign(data)),
+            'data': JSON.stringify(this.signPluginVersion(data)),
             'success': function(response){
                 success_callback(response)
             },
@@ -58,7 +58,7 @@ var oab = {
         oab.debugLog('POST to ' + request_type + ' ' + JSON.stringify(data));
     },
 
-    handle_api_error: function (data, displayFunction) {               // todo: check for more errors
+    handleAPIError: function (data, displayFunction) {               // todo: check for more errors
         var error_text = '';
         if (data.status == 401) {
             error_text = "Unauthorised - check your API key is valid."

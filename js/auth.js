@@ -8,7 +8,7 @@ function do_auth() {
         var status = document.getElementById('auth_feedback');
         
         // Check the API Key is valid
-        oab.auth_query(key, function(resp) {
+        oab.sendAuthQuery(key, function(resp) {
 
             //  success, Save the credentials to storage
             save_auth(key, function() {
