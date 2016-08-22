@@ -32,13 +32,12 @@ label {
 /* main page */
 .popup_main {
     margin: 0;
-    width: 300px;
-    height: 500px;
+    width: 350px;
+    height: 400px;
 }
 
 p {
     margin: 0 0 10px;
-    font-size: 10px;
 }
 
 .btn-group {

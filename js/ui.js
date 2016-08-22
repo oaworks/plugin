@@ -41,36 +41,47 @@ function openOptions() {
     }
 }
 
-function setButton(request_id, button_text, button_target, post_story) {
+function openTabs(list_of_urls){
+    for (var url of list_of_urls) {
+        chrome.tabs.create({url: url, active: false})
+    }
+}
+
+function setButton(button_text, button_targets, post_story) {
     var button = $('#submit');
     button.text(button_text);
 
-    if (button_target && post_story) { // story and redirect, redirect after post made
+    if (button_targets.length > 0 && post_story) { // story and redirect, redirect after post made
         button.click(function() {
             $('#spin-greybox').visible = true;
             sendStory(id, function () {
-                chrome.tabs.create({url: button_target});
+                openTabs(button_targets);
                 var pp = chrome.extension.getViews({type: 'popup'})[0];
                 pp.close();
             });
         });
-    } else if (post_story) { // story only; we need to tell the popup to close once it is sent
+    } else if (post_story) { // story only; we will get a reply informing what happens next
         button.click(function () {
             $('#spin-greybox').visible = true;
             sendStory(id, function () {
-                var pp = chrome.extension.getViews({type: 'popup'})[0];
-                pp.close();
+                $('#spin-greybox').visible = false;
             });
         });
-    } else if (button_target) { // target only, just open tab when button is clicked
+    } else if (button_targets) { // target only, just open tabs when button is clicked
         button.click(function() {
-            chrome.tabs.create({url: button_target})
+            openTabs(button_targets);
+            var pp = chrome.extension.getViews({type: 'popup'})[0];
+            pp.close();
         });
     }
 }
 
-function injectCheckbox(item) {
-    $('#dynamic_content').children('form').append(item.type + ' <input type="checkbox" name="' + item.type + '" value="' + item.type + '"><br>');
+function injectParagraph(text) {
+    $('#dynamic_content').children('form').append('<p>' + text + '</p>');
+}
+
+function injectCheckbox(label, val) {
+    $('#dynamic_content').children('form').append(label + ' <input type="checkbox" name="' + val + '" value="' + val + '"><br>');
 }
 
 function sendStory(request_id, callback) {
@@ -101,41 +112,53 @@ function handleAvailabilityResponse(response) {
     // The main extension logic - do different things depending on what the API returns about URL's status
     oab.debugLog('API response: ' + JSON.stringify(response.data));
 
-    // Display the UI for the types that we can request
+    // Change the UI depending on availability, existing requests, and the data types we can open new requests for.
     if (response.data.availability.length > 0) {
+        injectParagraph('Content is available - select which types to open using the checkboxes below.');
         for (var availability_entry of response.data.availability) {
-            // Show that this information is available
+            injectCheckbox(availability_entry.type, availability_entry.type)
         }
     } else if (response.data.requests.length > 0) {
+        injectParagraph('There are existing requests for this content.');
         for (var requests_entry of response.data.requests) {
             if (requests_entry.usupport) {
                 // The user has supported the request
-                break;
-            }
-            if (requests_entry.ucreated) {
+                injectCheckbox('You already support a request for the ' + requests_entry.type + '. View it?', 'view_support');
+                continue;
+            } else if (requests_entry.ucreated) {
                 // The user created this request
-                break;
+                injectCheckbox('You previously created a request for the ' + requests_entry.type + '. View it?', 'view_created');
+                continue;
             }
 
             // Otherwise, we ask for support for the request
-            injectCheckbox(requests_entry);
+            injectCheckbox('Support the request for the ' + requests_entry.type + '?', requests_entry.type);
+            $('#story_div').collapse(false);
         }
     } else if (response.data.accepts.length > 0) {
-        $('#dynamic_content').append('Create a new request: what type of content would you like? <br><form></form>');
+        injectParagraph('Create a new request: what type of content would you like?');
         for (var accepts_entry of response.data.accepts) {
-            injectCheckbox(accepts_entry);
+            injectCheckbox(accepts_entry.type, accepts_entry.type);
         }
         $('#story_div').collapse(false);
     } else {
         oab.debugLog("The API sent a misshapen response to our availability request.");
         displayError("Sorry, something went wrong with the API.")
     }
+
+    // todo: set the button text and function by reading the form and using setButton()
 }
 
 function handleRequestResponse(response) {
     // Take care of what we get back when we update a request
+    /*
+     Response will confirm request(s) have been created, and provide the IDs for them
+     Then plugin should say thanks, and show links to the open requests, and urge user to go and view them and take more action
+     */
 }
 
+
+// This is run when the extension loads
 chrome.storage.local.get({api_key : ''}, function(items) {
     if (items.api_key == '') {
         // If there is no API Key available, prompt the user to add one via the options
