@@ -15,17 +15,13 @@
   "content_scripts": [
     {
       "matches": ["*://openaccessbutton.org/account"],
-      "js": ["js/install.js"]
+      "js": ["js/account.js"]
     }
   ],
-  "options_ui": {
-    "page": "html/auth.html",
-    "chrome_style": true
-  },
   "permissions": [
     "tabs",
-    "http://*/*",
-    "https://*/*",
+    //"http://*/*",
+    //"https://*/*",
     "storage",
     "geolocation"
   ]
