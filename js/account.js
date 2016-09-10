@@ -1,9 +1,8 @@
 
 var foundkey;
 
-function save_auth(key) {
-  if (key === undefined) key = foundkey;
-  if (key === undefined) {
+function save_auth() {
+  if (foundkey === undefined) {
     console.log('Could not find key to save...');
   } else {
     chrome.storage.local.set({
@@ -20,7 +19,7 @@ function do_auth() {
     foundkey = document.getElementById('apikey').innerHTML;
     if (items.api_key === '') {
       if ( foundkey ) {
-        save_auth(foundkey);
+        save_auth();
       } else {
         document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-info"><p>Your API key could not be found!</p></div>';
       }
