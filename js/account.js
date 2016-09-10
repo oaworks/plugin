@@ -5,7 +5,7 @@ function save_auth() {
   chrome.storage.local.set({
     api_key: foundkey
   }, function() {
-    document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-info"><p>Your API key ' + key + 'has been saved to your plugin.</p></div>';
+    document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-info"><p>Your API key ' + foundkey + 'has been saved to your plugin.</p></div>';
   });
 }
 
