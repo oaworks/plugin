@@ -8,25 +8,25 @@ function handleAvailabilityResponse(response) {
   // Change the UI depending on availability, existing requests, and the data types we can open new requests for.
   if (response.data.availability.length > 0) {
     for ( var i = 0; i < response.data.availability.length; i++ ) {
-      $('#icon'+response.data.availability[i].type).css({'background-color':'green'});
-      $('#icon'+response.data.availability[i].type+'button').attr('href',response.data.availability[i].url);
+      document.getElementById('icon'+response.data.availability[i].type).style.backgroundColor = 'green';
+      document.getElementById('icon'+response.data.availability[i].type+'button').setAttribute('href',response.data.availability[i].url);
     }
   } else if (response.data.requests.length > 0) {
     for (var requests_entry of response.data.requests) {
-      $('#icon'+requests_entry.type).css({'background-color':'yellow'});
+      document.getElementById('icon'+requests_entry.type).style.backgroundColor = 'yellow';
       if (requests_entry.usupport || requests_entry.ucreated) {
-        $('#icon'+requests_entry.type+'button').attr('href',oab.site_address+'/request/'+requests_entry._id);
+        document.getElementById('icon'+requests_entry.type+'button').setAttribute('href',oab.site_address+'/request/'+requests_entry._id);
       } else {
-        $('#icon'+requests_entry.type+'button').attr('data-action','support');
-        $('#submit').attr('data-action','support');
-        $('#submit').attr('data-support',requests_entry._id);
+        document.getElementById('icon'+requests_entry.type+'button').setAttribute('data-action','support');
+        document.getElementById('submit').setAttribute('data-action','support');
+        document.getElementById('submit').setAttribute('data-support',requests_entry._id);
       }
     }
   } else if (response.data.accepts.length > 0) {
     for (var accepts_entry of response.data.accepts) {
-      $('#icon'+accepts_entry.type).css({'background-color':'red'});
-      $('#icon'+accepts_entry.type+'button').attr('data-action','create');
-      $('#submit').attr('data-action','create');
+      document.getElementById('icon'+accepts_entry.type).style.backgroundColor = 'red';
+      document.getElementById('icon'+accepts_entry.type+'button').setAttribute('data-action','create');
+      document.getElementById('submit').setAttribute('data-action','create');
     }
   } else {
     oab.debugLog("The API sent a misshapen response to our availability request.");
@@ -35,15 +35,15 @@ function handleAvailabilityResponse(response) {
 }
 
 function handleRequestResponse(response) {
-  $('#story_div').addClass('collapse');
-  $('#story').val("");
+  document.getElementById('story_div').className += ' collapse';
+  document.getElementById('story').value = "";
   var url = oab.site_address + '/request/' + response._id;
   var msg = "<p>Thanks very much for ";
-  msg += $('#submit').attr('data-action') === 'create' ? 'creat' : 'support';
+  msg += document.getElementById('submit').setAttribute('data-action') === 'create' ? 'creat' : 'support';
   msg += "ing this request!</p>";
   msg += "<p>Please take a moment to go and view the request, and provide any additional support that you can.</p>"
   msg += '<p>We have opened it up in a new tab for you. If your browser blocked it, you can open it <a class="label label-info" target="_blank" href="' + url + '">here</a>';
-  $('#message').html(msg);
+  document.getElementById('message').innerHTML = msg;
   try {
     chrome.tabs.create({url: url, active: false});
   } catch(err) {
@@ -95,59 +95,82 @@ try {
   oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
 }
 
-// Set up listeners for links and the story box
-$('#spin-greybox').visible = false;
-
-var need = function(e) {
-  if ( $(this).attr('href') === '#' && api_key ) {
-    e.preventDefault();
-    var action = $(this).attr('data-action');
-    var type = $(this).attr('data-type');
-    var ask = action === 'support' ? 'There is an open request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
-    ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
-    $('#story').attr('placeholder',ask);
-    $('#submit').attr('data-type',type);
-    action === 'support' ? $('#submit').html($('#submit').html().replace('create','support')) : $('#submit').html($('#submit').html().replace('support','create'));
-    $('#story_div').removeClass('collapse');
+var needs = document.getElementsByClassName('need');
+for ( var n in needs ) {
+  needs[n].onclick = function(e) {
+    if ( e.target.getAttribute('href') === '#' && api_key ) {
+      e.preventDefault();
+      var action = e.target.getAttribute('data-action');
+      var type = e.target.getAttribute('data-type');
+      var ask = action === 'support' ? 'There is an open request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
+      ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
+      document.getElementById('story').setAttribute('placeholder',ask);
+      document.getElementById('submit').setAttribute('data-type',type);
+      if ( action === 'support' ) {
+        document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('create','support');
+      } else {
+        document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('support','create');
+      }
+      document.getElementById('story_div').className = document.getElementById('story_div').className.replace('collapse','').replace('  ',' ');
+    }
   }
 }
-$('.need').bind('click',need);
 
-$('#submit').click(function () {
+document.getElementById('submit').onclick = function (e) {
   var data = {
-    story: $('#story').value
+    story: document.getElementById('story').value
   };
-  var action = $(this).attr('data-action');
+  var action = document.getElementById('submit').getAttribute('data-action');
   if ( action === 'create' ) {
-    data.type = $(this).attr('data-type');
+    data.type = document.getElementById('submit').getAttribute('data-type');
     data.url = page_url;
+    oab.sendRequestPost(api_key, data, handleRequestResponse, oab.handleAPIError);
   } else {
-    data._id = $(this).attr('data-support');
+    data._id = document.getElementById('submit').getAttribute('data-support');
+    oab.sendSupportPost(api_key, data, handleRequestResponse, oab.handleAPIError);
   }
-  oab.sendSupportPost(api_key, data, handleRequestResponse, oab.handleAPIError);
-});
+};
 
-$('#bug').click(function () {
+document.getElementById('bug').onclick = function () {
   chrome.tabs.create({'url': oab.site_address + "/bugs"});
-});
+};
 
-$('#logout').click(function () {
+document.getElementById('logout').onclick = function () {
   chrome.storage.local.remove('api_key')
-});
+};
 
-$('#story').keyup(function () {
-  var length = $(this).val().replace(/  +/g,' ').split(' ').length;
+document.getElementById('story').onkeyup = function () {
+  var length = document.getElementById('story').value.replace(/  +/g,' ').split(' ').length;
   var left = 25 - length;
   if (left < 0) {
     left = 0;
   }
-  if (length === 0) $('#submit').html('Tell us your story in up to <br><span id="counter">25</span> words to support this request').css({'background-color':'#f04717'}); 
-  if (length <= 5) $('#submit').html('Tell us your story with up to <span id="counter"></span><br> more words to support this request').css({'background-color':'#f04717'}); 
-  left < 25 && length > 5 ? $('#submit').removeAttr('disabled') : $('#submit').attr('disabled',true); 
-  if (length > 5 && length <= 10) $('#submit').html('Great, <span id="counter"></span> words remaining!<br>Write 5 more?').css({'background-color':'#ffff66'}); 
-  if (length > 10 && length <= 20) $('#submit').html('<span id="counter"></span> words left! Or click to submit<br>now and create your request!').css({'background-color':'#99ff99'}); 
-  if (length > 20) $('#submit').html('<span id="counter"></span>... Click now to submit your<br>story and create your request').css({'background-color':'#99ff99'}); 
-  $('#counter').text(left);
-});
+  if (length === 0) {
+    document.getElementById('submit').innerHTML = 'Tell us your story in up to <br><span id="counter">25</span> words to support this request';
+    document.getElementById('submit').style.backgroundColor = '#f04717'; 
+  }
+  if (length <= 5) {
+    document.getElementById('submit').innerHTML = 'Tell us your story with up to <span id="counter"></span><br> more words to support this request';
+    document.getElementById('submit').style.backgroundColor = '#f04717'; 
+  }
+  if ( left < 25 && length > 5 ) {
+    document.getElementById('submit').removeAttribute('disabled');
+  } else {
+    document.getElementById('submit').setAttribute('disabled',true);
+  }
+  if (length > 5 && length <= 10) {
+    document.getElementById('submit').innerHTML = 'Great, <span id="counter"></span> words remaining!<br>Write 5 more?';
+    document.getElementById('submit').style.backgroundColor = '#ffff66'; 
+  }
+  if (length > 10 && length <= 20) {
+    document.getElementById('submit').innerHTML = '<span id="counter"></span> words left! Or click to submit<br>now and create your request!';
+    document.getElementById('submit').style.backgroundColor = '#99ff99'; 
+  }
+  if (length > 20) {
+    document.getElementById('submit').innerHTML('<span id="counter"></span>... Click now to submit your<br>story and create your request');
+    document.getElementById('submit').style.backgroundColor = '#99ff99'; 
+  }
+  document.getElementById('counter').innerHTML = left;
+};
 
 

@@ -70,28 +70,18 @@ var oab = {
     }
   },
   
-  postToAPI: function(request_type, api_key, data, success_callback, failure_callback) {
-    var opts = {
-      'type': 'POST',
-      'url': oab.api_address + request_type,
-      'contentType': 'application/json; charset=utf-8',
-      'dataType': 'json',
-      'processData': false,
-      'cache': false,
-      'data': JSON.stringify(this.signPluginVersion(data)),
-      'success': function(response){
-        success_callback(response)
-      },
-      'error': function(response) {
-        failure_callback(response)
+  postToAPI: function(request_type, api_key, data, success_callback, failure_callback) {  
+    var http = new XMLHttpRequest();
+    var url = oab.api_address + request_type;
+    http.open("POST", url, true);
+    http.setRequestHeader("Content-type", "application/json; charset=utf-8");
+    if (api_key !== undefined) http.setRequestHeader("x-apikey", api_key);
+    http.onreadystatechange = function() {
+      if (http.readyState == XMLHttpRequest.DONE) {
+        http.status === 200 ? success_callback(JSON.parse(http.response)) : failure_callback(JSON.parse(http.response));
       }
     }
-    if (api_key !== undefined) {
-      opts.beforeSend = function (request) {
-        request.setRequestHeader("x-apikey", api_key);
-      }
-    }
-    $.ajax(opts);
+    http.send(JSON.stringify(this.signPluginVersion(data)));
     oab.debugLog('POST to ' + request_type + ' ' + JSON.stringify(data));
   },
 
