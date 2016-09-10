@@ -2,15 +2,11 @@
 var foundkey;
 
 function save_auth() {
-  if (foundkey === undefined) {
-    console.log('Could not find key to save...');
-  } else {
-    chrome.storage.local.set({
-      api_key: key
-    }, function() {
-      document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-info"><p>Your API key ' + key + 'has been saved to your plugin.</p></div>';
-    });
-  }
+  chrome.storage.local.set({
+    api_key: foundkey
+  }, function() {
+    document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-info"><p>Your API key ' + key + 'has been saved to your plugin.</p></div>';
+  });
 }
 
 function do_auth() {
