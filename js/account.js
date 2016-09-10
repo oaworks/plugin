@@ -19,7 +19,7 @@ function do_auth() {
       }
     } else if ( key !== items.api_key ) {
       var html = '<div class="alert alert-info"><p>Your API key appears to have been changed. Do you want to save the new API key ' + key + ' into your plugin?</p>';
-      html += '<p><a href="#" onclick="save_auth(' + key + ')">Yes, save the new API key to my plugin!</a></p>';
+      html += '<p><button class="btn" onclick="save_auth(' + key + ')">Yes, save the new API key to my plugin!</button></p>';
       html += '</div>';
       document.getElementById('plugin_messages').innerHTML = html;
     } else {
