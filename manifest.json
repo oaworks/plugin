@@ -1,8 +1,8 @@
 {
   "name": "OAB Unified Extension",
-  "version": "0.0.5",
-  "version_name": "oab_unified_0.0.5",
-  "manifest_version": 5,
+  "version": "0.0.6",
+  "version_name": "oab_unified_0.0.6",
+  "manifest_version": 6,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": {
     "128": "img/oa128.png"
@@ -15,10 +15,12 @@
   "content_scripts": [
     {
       "matches": ["*://openaccessbutton.org/account","*://oab.test.cottagelabs.com/account"],
+      "run_at": "document_end",
       "js": ["js/account.js"]
     },
     {
       "matches": ["*://*/*verify=oabutton*"],
+      "run_at": "document_end",
       "js": ["js/verify.js"]
     }
   ],

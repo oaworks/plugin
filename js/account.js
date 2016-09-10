@@ -22,5 +22,5 @@ function do_auth() {
 
 setTimeout(function() {
   do_auth();
-}, 1000);
+}, 3000);
 
