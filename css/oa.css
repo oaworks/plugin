@@ -111,10 +111,6 @@ ul {
   text-align: left;
 }
 
-.med-text{
-  font-size: 12px;
-}
-
 .anchored-bottom {
   position:absolute;
   bottom: 0;
@@ -129,14 +125,6 @@ ul {
 
 .title-emph{
   font-style: italic;
-}
-
-.checkbox {
-  position: relative;
-  display: block;
-  min-height: 20px;
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 
 div .auth_email_group {

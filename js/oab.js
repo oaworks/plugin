@@ -4,42 +4,72 @@ var oab = {
 
   debug : true,
 
-  api_address : 'https://dev.api.cottagelabs.com/service/oab',                //'https://api.opendatabutton.org',
+  api_address : 'https://dev.api.cottagelabs.com/service/oab', //'https://api.openaccessbutton.org',
 
-  site_address : 'https://oab.test.cottagelabs.com',
+  site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
 
+  howto_address : '/howto',
+  
   register_address : '/account',
+  
+  messages: 'message', // a div ID name to put error messages etc
 
   // Tell the API which plugin version is in use for each POST
-  signPluginVersion: function(pdata) {
+  signPluginVersion: function(data) {
     // Add the debug key if turned on
-    var signed_post;
     try {
       var manifest = chrome.runtime.getManifest();
-      signed_post = $.extend(pdata, { plugin: manifest.version_name } );
+      data.plugin = manifest.version_name;
     } catch (err) {
-      signed_post = $.extend(pdata, { plugin: 'oab_test_page' } );
+      data.plugin = 'oab_test_page';
+      data.test = true;
     }
+    if (oab.debug) data.test = true;
+    return data;
+  },
 
-    if (oab.debug) {
-      return $.extend(signed_post, { test: true })
+  sendAvailabilityQuery: function(api_key, url, success_callback, failure_callback) {
+    oab.postLocated('/availability', api_key, { url: url }, success_callback, failure_callback)
+  },
+
+  sendRequestPost: function(api_key, data, success_callback, failure_callback) {
+    var request_id = data._id ? data._id : '';
+    oab.postLocated('/request/' + request_id, api_key, data, success_callback, failure_callback)
+  },
+
+  sendSupportPost: function(api_key, data, success_callback, failure_callback) {
+    var request_id = data._id ? data._id : undefined;
+    if ( request_id ) {
+      oab.postLocated('/support/' + request_id, api_key, data, success_callback, failure_callback);
     } else {
-      return signed_post
+      // refuse to send
+      oab.debugLog('Not sending support post without request ID');
     }
   },
 
-  sendAuthQuery: function(api_key, success_callback, failure_callback) {
-    oab.postToAPI('', api_key, {}, success_callback, failure_callback)
+  // try to append location to the data object before POST
+  postLocated: function(request_type,key,data,success_callback,error_callback) {
+    try {
+      if (navigator.geolocation) {
+        var opts = {timeout: 5000};
+        navigator.geolocation.getCurrentPosition(function (position) {
+          data.location = {geo: {lat: position.coords.latitude, lon: position.coords.longitude}};
+          oab.postToAPI(request_type,key,data,success_callback,error_callback);
+        }, function (error) {
+          oab.debugLog(error.message);
+          oab.postToAPI(request_type,key,data,success_callback,error_callback);
+        }, opts);
+      } else {
+        // Browser does not support location
+        oab.debugLog('GeoLocation is unsupported.');
+        oab.postToAPI(request_type,key,data,success_callback,error_callback);
+      }
+    } catch (e) {
+      oab.debugLog("A location error has occurred.");
+      oab.postToAPI(request_type,key,data,success_callback,error_callback);
+    }
   },
-
-  sendAvailabilityQuery: function(url, success_callback, failure_callback) {
-    oab.postToAPI('/availability', undefined, { url: url }, success_callback, failure_callback)
-  },
-
-  sendRequestPost: function(api_key, request_id, data, success_callback, failure_callback) {
-    oab.postToAPI('/request/' + request_id, api_key, data, success_callback, failure_callback)
-  },
-
+  
   postToAPI: function(request_type, api_key, data, success_callback, failure_callback) {
     var opts = {
       'type': 'POST',
@@ -65,15 +95,31 @@ var oab = {
     oab.debugLog('POST to ' + request_type + ' ' + JSON.stringify(data));
   },
 
-  handleAPIError: function (data, displayFunction) {               // todo: check for more errors
+  displayMessage: function(msg, div, type) {
+    if (div === undefined) div = document.getElementById(oab.messages);
+    if (type === undefined) {
+      type = '';
+    } else if ( type === 'error' ) {
+      type = 'alert-danger';
+    }
+    div.innerHTML = '<div class="alert ' + type + '" role="alert">' + msg + '</div>';
+  },
+
+  handleAPIError: function(data, displayError) {
+    // TODO handle the blacklist error, whatever it may be
     var error_text = '';
-    if (data.status === 401) {
-      error_text = "Unauthorised - check your API key is valid."
+    if (data.status === 400) {
+      error_text = 'Sorry, the page you are on is not one that we can check availability for. See the <a href="' + oab.site_address + oab.howto_address + '">HOWTO</a> for further information';
+    } else if (data.status === 401) {
+      error_text = "Unauthorised - check your API key is valid. Go to ";
+      error_text += oab.site_address + oab.register_address + " and sign up if you have not already done so. Once you are signed in the plugin should find your API key for you."
     } else if (data.status === 403) {
-      error_text = "Forbidden - account may already exist."
+      error_text = "Forbidden. Please file a bug."
+    } else {
+      error_text = data.status + ". Sorry, unknown error, please file a bug including this code."
     }
     if (error_text !== '') {
-      displayFunction(error_text);
+      oab.displayMessage(error_text, undefined, 'error');
     }
   },
 
