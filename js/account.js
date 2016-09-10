@@ -10,7 +10,7 @@ function save_auth(key) {
 function do_auth() {
   document.getElementById('chromeinstall').style.display = 'none';
   chrome.storage.local.get({api_key : ''}, function(items) {
-    var key = document.getElementById('apikey').value;
+    var key = document.getElementById('apikey').innerHTML;
     if (items.api_key === '') {
       if ( key !== "") {
         save_auth(key);
