@@ -48,7 +48,7 @@ function handleRequestResponse(response) {
     chrome.tabs.create({url: url, active: false});
   } catch(err) {
     // try opening direct with js
-    console.log('Cannot open new tab for ' + url + ' - probably in the test page. Trying to open directly with js')
+    oab.debugLog('Cannot open new tab for ' + url + ' - probably in the test page. Trying to open directly with js')
     window.open(url,'_blank');
   }
 }
@@ -64,6 +64,7 @@ try {
       oab.displayMessage(noapimsg);
     } else {
       api_key = items.api_key;
+      oab.debugLog('api key is available from chrome storage: ' + api_key);
     }
   });
 } catch (err) {
@@ -73,7 +74,7 @@ try {
   } catch(err) {}
   if (apik) {
     // this is just useful for testing...
-    console.log('Got api key ' + apik + ' direct from url param for testing');
+    oab.debugLog('Got api key ' + apik + ' direct from url param for testing');
     api_key = apik;
   } else {
     oab.displayMessage('(you are on the test page - you can provide an apikey url param to override this msg).<br>' + noapimsg);
