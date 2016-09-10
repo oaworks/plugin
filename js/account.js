@@ -1,6 +1,6 @@
 
 function do_auth() {
-  $('.dl').hide();
+  document.getElementById('chromeinstall').style.display = 'none';
   chrome.storage.local.get({api_key : ''}, function(items) {
     if (items.api_key === '') {
       var key = document.getElementById('apikey').value;
