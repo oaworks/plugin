@@ -1,11 +1,10 @@
-Unified Extension
+Open Access Button Unified Extension
 ===============
-
-**Open Access Button Unified Extension**
 
 This will be a WebExtension which runs on Firefox and Chrome (and maybe Opera) which encapsulates functionality of the incumbent [Open Access Button](https://github.com/OAButton/oab-chromeaddon) and [Open Data Button](https://github.com/OAButton/odb-chromeaddon)
 
 ### packaging for firefox
+
 Firefox requires extra keys in the manifest, and the project files zip archived with extension ```.xpi```. The script ```pack_ffx.py``` does this. Supply the required [extension ID](https://developer.mozilla.org/en-US/Add-ons/Install_Manifests#id).
 ```./pack_ffx.py -i oab-ffx@openaccessbutton.org```
 
@@ -14,9 +13,9 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 
 ### Getting the latest extension
 
-* Go to the repo page
+* Go to main the repo page, or the latest release
 * you should be on the develop branch automatically because it is the newest branch but if not, switch to develop in the drop down option on the left
-* click the big green button that says clone or download, click it
+* click the big green button that says clone or download
 * click download
 * you will get a zip
 * Navigate to the file on your computer, double click it to unzip it and you have the code
