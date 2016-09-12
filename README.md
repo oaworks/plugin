@@ -26,6 +26,11 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 * you will get a zip
 * Navigate to the file on your computer, double click it to unzip it and you have the code
 
+#### Or, for leet coders
+
+* git clone
+* git checkout develop
+
 ### Installing the file on Chrome
 
 * In Chrome, go to chrome://extensions via the url bar, tick the 'Developer mode' tick-box
