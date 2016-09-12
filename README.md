@@ -35,4 +35,5 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 
 * In Chrome, go to chrome://extensions via the url bar, tick the 'Developer mode' tick-box
 * Click the newly appeared 'Load unpacked extension...' button
-* Browse to the project directory, click 'Select'. It'll appear in the extensions list.
+* Browse to the project directory you just downloaded, click 'Select'. It'll appear in the extensions list.
+ 
