@@ -19,12 +19,12 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 
 ### Getting the latest extension
 
-* Go to main the repo page, or the latest release
-* you should be on the develop branch automatically because it is the newest branch but if not, switch to develop in the drop down option on the left
-* click the big green button that says clone or download
-* click download
-* you will get a zip
-* Navigate to the file on your computer, double click it to unzip it and you have the code
+* Go to main for this repo page, unified-extension. 
+* Be sure you are on the develop branch, if not, switch to develop in the drop down option on the top left of the page.
+* click the big green button on the top right that says 'clone or download'.
+* click download to get a zip file of the latest extension.
+* Dowload the zip.
+* Navigate and find file on your computer, double click it to unzip it and have access to the latest code.
 
 #### Or, for leet coders
 
@@ -33,7 +33,8 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 
 ### Installing the file on Chrome
 
-* In Chrome, go to chrome://extensions via the url bar, tick the 'Developer mode' tick-box
+* In Chrome, go to chrome://extensions via the url bar, tick the 'Developer mode' tick-box in the top right corner.
 * Click the newly appeared 'Load unpacked extension...' button
-* Browse to the project directory you just downloaded, click 'Select'. It'll appear in the extensions list.
+* Browse to the project directory you just downloaded, click 'Select'. It will upload the zip file you just downloaded. 
+* If you're experiencing problems with any of these steps, feel free to leave an issue on the backend. 
  
