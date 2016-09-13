@@ -19,7 +19,7 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 
 ### Getting the latest extension
 
-* Go to main for this repo page, unified-extension. 
+* Go to code page for this repo page, [unified-extension](https://github.com/meganwaps/unified-extension/). 
 * Be sure you are on the develop branch, if not, switch to develop in the drop down option on the top left of the page.
 * click the big green button on the top right that says 'clone or download'.
 * click download to get a zip file of the latest extension.
@@ -36,5 +36,5 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 * In Chrome, go to chrome://extensions via the url bar, tick the 'Developer mode' tick-box in the top right corner.
 * Click the newly appeared 'Load unpacked extension...' button
 * Browse to the project directory you just downloaded, click 'Select'. It will upload the zip file you just downloaded. 
-* If you're experiencing problems with any of these steps, feel free to leave an issue on the backend. 
+* If you're experiencing problems with any of these steps, feel free to leave an issue on the backend repository [here](https://github.com/OAButton/backend/issues/new). 
  
