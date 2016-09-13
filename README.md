@@ -23,8 +23,8 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 * Be sure you are on the develop branch, if not, switch to develop in the drop down option on the top left of the page.
 * click the big green button on the top right that says 'clone or download'.
 * click download to get a zip file of the latest extension.
-* Dowload the zip.
-* Navigate and find file on your computer, double click it to unzip it and have access to the latest code.
+* Download the zip.
+* Navigate and find the file on your computer, double click it to unzip it. You now have the latest code.
 
 #### Or, for leet coders
 
