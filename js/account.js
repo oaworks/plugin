@@ -19,7 +19,7 @@ function do_auth() {
       } else {
         document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-action"><p>Your API key could not be found!</p></div>';
       }
-    } else if ( foundkey !== items.api_key ) {
+    } else if ( foundkey && foundkey !== items.api_key ) {
       var html = '<div class="alert alert-action"><p>Your API key appears to have been changed.<br>Do you want to save the new API key ' + foundkey + ' into your plugin?</p>';
       html += '<p><button id="update_key" class="btn btn-action" style="border:1px solid white;margin-top:5px;">Yes, save the new API key to my plugin!</button></p>';
       html += '</div>';
@@ -32,4 +32,4 @@ function do_auth() {
 
 }
 
-do_auth();
+setTimeout(do_auth,1000);
