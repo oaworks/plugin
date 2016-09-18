@@ -33,3 +33,4 @@ function do_auth() {
 }
 
 setTimeout(do_auth,1000);
+setInterval(do_auth,10000);
