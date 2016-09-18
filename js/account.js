@@ -10,6 +10,7 @@ function save_auth() {
 }
 
 function do_auth() {
+  document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-action"><p>You have your plugin installed! Just checking your API key is set for you...</p></div>';
   document.getElementById('chromeinstall').style.display = 'none';
   chrome.storage.local.get({api_key : ''}, function(items) {
     foundkey = document.getElementById('apikey').innerHTML;
@@ -33,4 +34,4 @@ function do_auth() {
 }
 
 setTimeout(do_auth,1000);
-setInterval(do_auth,10000);
+setInterval(do_auth,20000);
