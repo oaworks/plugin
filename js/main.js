@@ -63,7 +63,7 @@ function handleRequestResponse(response) {
 
 try {
   chrome.tabs.executeScript({
-    code: 'console.log("hello"); chrome.storage.local.set({dom: "HELLO" });'
+    code: 'chrome.storage.local.set({dom: document.all[0].outerHTML });'
   });
 } catch(err) {}
 
@@ -146,16 +146,10 @@ document.getElementById('submit').onclick = function (e) {
     data.url = page_url;
     try {
       chrome.storage.local.get({dom : ''}, function(items) {
-        if (items.dom !== '') {
-          data.dom = items.dom;
-          oab.debugLog('Retrieved dom from chrome storage');
-        } else {
-          oab.debugLog('Could not get dom from chrome storage');
-        }
+        if (items.dom !== '') data.dom = items.dom;
         oab.sendRequestPost(api_key, data, handleRequestResponse, oab.handleAPIError);
       });
     } catch (err) {
-      oab.debugLog('Could not get dom from chrome storage');
       oab.sendRequestPost(api_key, data, handleRequestResponse, oab.handleAPIError);
     }
   } else {
