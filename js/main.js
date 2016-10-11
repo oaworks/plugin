@@ -1,5 +1,10 @@
+
+// =============================================
+// declare vars and functions
+
 var api_key;
 var page_url;
+var dom;
 
 function handleAvailabilityResponse(response) {
   // The main extension logic - do different things depending on what the API returns about URL's status
@@ -54,8 +59,9 @@ function handleRequestResponse(response) {
 }
 
 
+// =============================================
 // These are run when the extension loads
-var dom = '';
+
 try {
   chrome.browserAction.onClicked.addListener(function (tab) {
     chrome.tabs.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
@@ -111,6 +117,10 @@ try {
   oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
 }
 
+
+// =============================================
+// bind actions to the elements
+
 var needs = document.getElementsByClassName('need');
 for ( var n in needs ) {
   needs[n].onclick = function(e) {
@@ -140,6 +150,7 @@ document.getElementById('submit').onclick = function (e) {
   if ( action === 'create' ) {
     data.type = document.getElementById('submit').getAttribute('data-type');
     data.url = page_url;
+    data.dom = dom;
     oab.sendRequestPost(api_key, data, handleRequestResponse, oab.handleAPIError);
   } else {
     data._id = document.getElementById('submit').getAttribute('data-support');
