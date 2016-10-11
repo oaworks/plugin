@@ -54,11 +54,8 @@ function handleRequestResponse(response) {
 }
 
 
-// This is run when the extension loads
+// These are run when the extension loads
 var dom = '';
-var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
-noapimsg += ' Please <a class="label label-info" href="' + oab.site_address + oab.register_address;
-noapimsg += '">signup or login</a> now, and your API key will be automatically retrieved.';
 try {
   chrome.browserAction.onClicked.addListener(function (tab) {
     chrome.tabs.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
@@ -68,10 +65,15 @@ try {
     });
   });  
 } catch(err) {
-  dom = '<html>' + document.html.innerHTML + '</html>';
+  dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
   oab.debugLog('Got full page dom direct from page');
   oab.debugLog(dom);
 }
+
+var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
+noapimsg += ' Please <a class="label label-info" href="' + oab.site_address + oab.register_address;
+noapimsg += '">signup or login</a> now, and your API key will be automatically retrieved.';
+
 try {
   chrome.storage.local.get({api_key : ''}, function(items) {
     if (items.api_key === '') {
