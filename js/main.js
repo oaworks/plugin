@@ -62,12 +62,9 @@ function handleRequestResponse(response) {
 // These are run when the extension loads
 
 try {
-  chrome.browserAction.onClicked.addListener(function(tab) {
-    oab.debugLog('Click triggered attempt to get dom');
-    chrome.tabs.executeScript({
-      code: 'chrome.storage.local.set({dom: "HELLO" });'
-    });
-  });  
+  chrome.tabs.executeScript({
+    code: 'console.log("hello"); chrome.storage.local.set({dom: "HELLO" });'
+  });
 } catch(err) {}
 
 var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
