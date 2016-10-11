@@ -58,19 +58,24 @@ function handleRequestResponse(response) {
   }
 }
 
+function setDom(dom) {
+  dom = dom;
+  oab.debugLog('Got full page dom from chrome plugin methods');
+  oab.debugLog(dom);
+}
 
 // =============================================
 // These are run when the extension loads
 
 try {
-  chrome.browserAction.onClicked.addListener(function (tab) {
-    oab.debugLog('Prepping to send runtime msg to get dom')
+  chrome.runtime.onConnect.addListener(function(port) {
+    port.postMessage({text:"dom"},setDom);
+  });
+  /*chrome.browserAction.onClicked.addListener(function (tab) {
     chrome.runtime.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
       dom = dom;
-      oab.debugLog('Got full page dom from chrome plugin methods');
-      oab.debugLog(dom);
     });
-  });  
+  });*/  
 } catch(err) {
   dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
   oab.debugLog('Got full page dom direct from page');
@@ -162,9 +167,12 @@ document.getElementById('submit').onclick = function (e) {
   }
 };
 
-document.getElementById('bug').onclick = function () {
-  chrome.tabs.create({'url': oab.site_address + "/bugs"});
-};
+document.getElementById('bug').setAttribute('href',oab.site_address + "/bugs");
+if (chrome && chrome.tabs) {
+  document.getElementById('bug').onclick = function () {
+    chrome.tabs.create({'url': oab.site_address + "/bugs"});
+  };
+}
 
 document.getElementById('story').onkeyup = function () {
   var length = document.getElementById('story').value.replace(/  +/g,' ').split(' ').length;
