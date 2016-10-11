@@ -62,7 +62,7 @@ function handleRequestResponse(response) {
 // =============================================
 // These are run when the extension loads
 
-try {
+//try {
   chrome.browserAction.onClicked.addListener(function (tab) {
     chrome.tabs.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
       dom = dom;
@@ -70,11 +70,11 @@ try {
       oab.debugLog(dom);
     });
   });  
-} catch(err) {
+/*} catch(err) {
   dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
   oab.debugLog('Got full page dom direct from page');
   oab.debugLog(dom);
-}
+}*/
 
 var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
 noapimsg += ' Please <a class="label label-info" href="' + oab.site_address + oab.register_address;
