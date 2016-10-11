@@ -4,7 +4,6 @@
 
 var api_key;
 var page_url;
-var dom;
 
 function handleAvailabilityResponse(response) {
   // The main extension logic - do different things depending on what the API returns about URL's status
@@ -58,29 +57,18 @@ function handleRequestResponse(response) {
   }
 }
 
-function setDom(dom) {
-  dom = dom;
-  oab.debugLog('Got full page dom from chrome plugin methods');
-  oab.debugLog(dom);
-}
 
 // =============================================
 // These are run when the extension loads
 
 try {
-  chrome.runtime.onConnect.addListener(function(port) {
-    port.postMessage({text:"dom"},setDom);
-  });
-  /*chrome.browserAction.onClicked.addListener(function (tab) {
-    chrome.runtime.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
-      dom = dom;
+  chrome.browserAction.onClicked.addListener(function(tab) {
+    oab.debugLog('Click triggered attempt to get dom');
+    chrome.tabs.executeScript({
+      code: 'chrome.storage.local.set({dom: "HELLO" });'
     });
-  });*/  
-} catch(err) {
-  dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
-  oab.debugLog('Got full page dom direct from page');
-  oab.debugLog(dom);
-}
+  });  
+} catch(err) {}
 
 var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
 noapimsg += ' Please <a id="noapikey" class="label label-info" href="' + oab.site_address + oab.register_address;
@@ -159,8 +147,20 @@ document.getElementById('submit').onclick = function (e) {
   if ( action === 'create' ) {
     data.type = document.getElementById('submit').getAttribute('data-type');
     data.url = page_url;
-    data.dom = dom;
-    oab.sendRequestPost(api_key, data, handleRequestResponse, oab.handleAPIError);
+    try {
+      chrome.storage.local.get({dom : ''}, function(items) {
+        if (items.dom !== '') {
+          data.dom = items.dom;
+          oab.debugLog('Retrieved dom from chrome storage');
+        } else {
+          oab.debugLog('Could not get dom from chrome storage');
+        }
+        oab.sendRequestPost(api_key, data, handleRequestResponse, oab.handleAPIError);
+      });
+    } catch (err) {
+      oab.debugLog('Could not get dom from chrome storage');
+      oab.sendRequestPost(api_key, data, handleRequestResponse, oab.handleAPIError);
+    }
   } else {
     data._id = document.getElementById('submit').getAttribute('data-support');
     oab.sendSupportPost(api_key, data, handleRequestResponse, oab.handleAPIError);
