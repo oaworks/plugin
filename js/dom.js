@@ -11,4 +11,4 @@ port.onMessage.addListener(function(message,sender,sendResponse) {
     sendResponse('HELLO');
     //sendResponse(document.all[0].outerHTML);
   }
-});8?
+});8?*/
