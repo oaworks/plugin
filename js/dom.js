@@ -1,6 +1,7 @@
-var port = chrome.runtime.connect({name:"main"});
+var port = chrome.runtime.connect({name:"main.js"});
 port.onMessage.addListener(function(message,sender,sendResponse) {
-  if(message.text === "dom"){
+  console.log('getting a msg')
+  if (message.text === "dom") {
     sendResponse('HELLO');
   }
 });
