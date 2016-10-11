@@ -44,7 +44,7 @@ function handleRequestResponse(response) {
   document.getElementById('story').value = "";
   var url = oab.site_address + '/request/' + response._id;
   var msg = "<p>Thanks very much for ";
-  msg += document.getElementById('submit').setAttribute('data-action') === 'create' ? 'creat' : 'support';
+  msg += document.getElementById('submit').getAttribute('data-action') === 'create' ? 'creat' : 'support';
   msg += "ing this request!</p>";
   msg += "<p>Please take a moment to go and view the request, and provide any additional support that you can.</p>"
   msg += '<p>We have opened it up in a new tab for you. If your browser blocked it, you can open it <a class="label label-info" target="_blank" href="' + url + '">here</a>';
@@ -62,9 +62,9 @@ function handleRequestResponse(response) {
 // =============================================
 // These are run when the extension loads
 
-try {
+/*try {
   chrome.browserAction.onClicked.addListener(function (tab) {
-    chrome.tabs.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
+    chrome.runtime.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
       dom = dom;
       oab.debugLog('Got full page dom from chrome plugin methods');
       oab.debugLog(dom);
@@ -74,7 +74,8 @@ try {
   dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
   oab.debugLog('Got full page dom direct from page');
   oab.debugLog(dom);
-}
+}*/
+dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
 
 var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
 noapimsg += ' Please <a id="noapikey" class="label label-info" href="' + oab.site_address + oab.register_address;
