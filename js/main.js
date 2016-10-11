@@ -62,8 +62,9 @@ function handleRequestResponse(response) {
 // =============================================
 // These are run when the extension loads
 
-/*try {
+try {
   chrome.browserAction.onClicked.addListener(function (tab) {
+    oab.debugLog('Prepping to send runtime msg to get dom')
     chrome.runtime.sendMessage(tab.id, {text: 'gimme'}, function(dom) { 
       dom = dom;
       oab.debugLog('Got full page dom from chrome plugin methods');
@@ -74,8 +75,7 @@ function handleRequestResponse(response) {
   dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
   oab.debugLog('Got full page dom direct from page');
   oab.debugLog(dom);
-}*/
-dom = '<html><head>' + document.head.innerHTML + '</head><body>' + document.body.innerHTML + '</body></html>';
+}
 
 var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
 noapimsg += ' Please <a id="noapikey" class="label label-info" href="' + oab.site_address + oab.register_address;
