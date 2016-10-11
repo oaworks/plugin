@@ -96,17 +96,16 @@ var oab = {
   },
 
   handleAPIError: function(data, displayError) {
-    // TODO handle the blacklist error, whatever it may be
     var error_text = '';
     if (data.status === 400) {
       error_text = 'Sorry, the page you are on is not one that we can check availability for. See the <a href="' + oab.site_address + oab.howto_address + '">HOWTO</a> for further information';
     } else if (data.status === 401) {
       error_text = "Unauthorised - check your API key is valid. Go to ";
-      error_text += oab.site_address + oab.register_address + " and sign up if you have not already done so. Once you are signed in the plugin should find your API key for you."
+      error_text += oab.site_address + oab.register_address + " and sign up if you have not already done so. Once you are signed in the plugin should find your API key for you.";
     } else if (data.status === 403) {
-      error_text = "Forbidden. Please file a bug."
+      error_text = "Forbidden. Please file a bug.";
     } else {
-      error_text = data.status + ". Sorry, unknown error, please file a bug including this code."
+      error_text = data.status + ". Sorry, unknown error, please file a bug including this code: " + data.status;
     }
     if (error_text !== '') {
       oab.displayMessage(error_text, undefined, 'error');
