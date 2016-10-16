@@ -13,6 +13,8 @@ var oab = {
   
   register_address : '/account',
   
+  bug_address : '/bug',
+  
   messages: 'message', // a div ID name to put error messages etc
 
   // Tell the API which plugin version is in use for each POST
@@ -97,18 +99,31 @@ var oab = {
 
   handleAPIError: function(data, displayError) {
     var error_text = '';
-    if (data.status === 400) {
-      error_text = 'Sorry, the page you are on is not one that we can check availability for. See the <a href="' + oab.site_address + oab.howto_address + '">instructions</a> for help.';
-    } else if (data.status === 401) {
+    if (data.statusCode === 400) {
+      error_text = 'Sorry, the page you are on is not one that we can check availability for. See the <a href="' + oab.site_address + oab.howto_address + '" id="goto_instructions">instructions</a> for help.';
+    } else if (data.statusCode === 401) {
       error_text = "Unauthorised - check your API key is valid. Go to ";
-      error_text += oab.site_address + oab.register_address + " and sign up if you have not already done so. Once you are signed in the plugin should find your API key for you.";
-    } else if (data.status === 403) {
+      error_text += '<a href="' + oab.site_address + oab.register_address + '" id="goto_register">';
+      error_text += oab.site_address + oab.register_address + "</a> and sign up if you have not already done so. Once you are signed in the plugin should find your API key for you.";
+    } else if (data.statusCode === 403) {
       error_text = "Forbidden - please file a bug.";
     } else {
-      error_text = data.status + ". Sorry, unknown error, perhaps the system is offline, or you are offline. Please file a bug including this code: " + data.status;
+      error_text = data.statusCode + ". Sorry, unknown error, perhaps the system is offline, or you are offline. Please file a bug including this code: " + data.statusCode;
     }
     if (error_text !== '') {
       oab.displayMessage(error_text, undefined, 'error');
+      if (chrome && chrome.tabs) {
+        if ( document.getElementById('goto_instructions') ) {
+          document.getElementById('goto_instructions').onclick = function () {
+            chrome.tabs.create({'url': oab.site_address + oab.howto_address});
+          };
+        }
+        if ( document.getElementById('goto_register') ) {
+          document.getElementById('goto_register').onclick = function () {
+            chrome.tabs.create({'url': oab.site_address + oab.register_address});
+          };
+        }
+      }
     }
   },
 

@@ -173,10 +173,10 @@ document.getElementById('submit').onclick = function (e) {
   }
 };
 
-document.getElementById('bug').setAttribute('href',oab.site_address + "/bug");
+document.getElementById('bug').setAttribute('href',oab.site_address + oab.bug_address);
 if (chrome && chrome.tabs) {
   document.getElementById('bug').onclick = function () {
-    chrome.tabs.create({'url': oab.site_address + "/bug"});
+    chrome.tabs.create({'url': oab.site_address + oab.bug_address});
   };
 }
 

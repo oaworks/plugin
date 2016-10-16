@@ -1,8 +1,8 @@
 {
   "name": "OAB Unified Extension",
-  "version": "0.0.39",
-  "version_name": "oab_unified_0.0.39",
-  "manifest_version": 39,
+  "version": "0.0.40",
+  "version_name": "oab_unified_0.0.40",
+  "manifest_version": 40,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": {
     "128": "img/oa128.png"
