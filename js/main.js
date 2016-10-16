@@ -8,16 +8,19 @@ var page_url;
 function handleAvailabilityResponse(response) {
   // The main extension logic - do different things depending on what the API returns about URL's status
   oab.debugLog('API response: ' + JSON.stringify(response.data));
+
+  document.getElementById('buttonstatus').className = document.getElementById('buttonstatus').className.replace('collapse','').replace('  ',' ');
+  document.getElementById('loading_area').className = 'row collapse';
   
   // Change the UI depending on availability, existing requests, and the data types we can open new requests for.
   if (response.data.availability.length > 0) {
     for ( var i = 0; i < response.data.availability.length; i++ ) {
-      document.getElementById('icon'+response.data.availability[i].type).style.backgroundColor = 'green';
+      document.getElementById('icon'+response.data.availability[i].type).style.backgroundColor = '#398bc5';
       document.getElementById('icon'+response.data.availability[i].type+'button').setAttribute('href',response.data.availability[i].url);
     }
   } else if (response.data.requests.length > 0) {
     for (var requests_entry of response.data.requests) {
-      document.getElementById('icon'+requests_entry.type).style.backgroundColor = 'yellow';
+      document.getElementById('icon'+requests_entry.type).style.backgroundColor = '#f04717';
       if (requests_entry.usupport || requests_entry.ucreated) {
         document.getElementById('icon'+requests_entry.type+'button').setAttribute('href',oab.site_address+'/request/'+requests_entry._id);
       } else {
@@ -28,7 +31,7 @@ function handleAvailabilityResponse(response) {
     }
   } else if (response.data.accepts.length > 0) {
     for (var accepts_entry of response.data.accepts) {
-      document.getElementById('icon'+accepts_entry.type).style.backgroundColor = 'red';
+      document.getElementById('icon'+accepts_entry.type).style.backgroundColor = '#f04717';
       document.getElementById('icon'+accepts_entry.type+'button').setAttribute('data-action','create');
       document.getElementById('submit').setAttribute('data-action','create');
     }
@@ -60,6 +63,14 @@ function handleRequestResponse(response) {
 
 // =============================================
 // These are run when the extension loads
+
+try {
+  if (window.location.href.indexOf('debug=true') !== -1 || window.location.href.indexOf('test.cottagelabs') !== -1 || window.location.href.indexOf('apikey=') !== -1) {
+    oab.debug = true;
+    oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
+    oab.site_address = 'http://oab.test.cottagelabs.com';
+  }
+} catch(err) {}
 
 try {
   chrome.tabs.executeScript({
@@ -118,10 +129,10 @@ try {
 var needs = document.getElementsByClassName('need');
 for ( var n in needs ) {
   needs[n].onclick = function(e) {
-    if ( e.target.getAttribute('href') === '#' && api_key ) {
+    if ( e.target.parentNode.getAttribute('href') === '#' && api_key ) {
       e.preventDefault();
-      var action = e.target.getAttribute('data-action');
-      var type = e.target.getAttribute('data-type');
+      var action = e.target.parentNode.getAttribute('data-action');
+      var type = e.target.parentNode.getAttribute('data-type');
       var ask = action === 'support' ? 'There is an open request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
       ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
       document.getElementById('story').setAttribute('placeholder',ask);
