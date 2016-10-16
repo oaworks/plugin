@@ -103,13 +103,13 @@ try {
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
     // Start by checking the status of the URL for the current tab
     page_url = tabs[0].url.split('#')[0];
-    if (page_url.indexOf('debug=true') !== -1) {
+    if (tabs[0].url.indexOf('debug=true') !== -1) {
       oab.debug = true;
       oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
       oab.site_address = 'http://oab.test.cottagelabs.com';
       page_url = page_url.replace('debug=true','');
     }
-    if (page_url.indexOf('test=true') !== -1) {
+    if (tabs[0].url.indexOf('test=true') !== -1) {
       oab.test = true;
       page_url = page_url.replace('test=true','');
     }
@@ -122,7 +122,7 @@ try {
   oab.site_address = 'http://oab.test.cottagelabs.com';
   oab.debugLog('Sending availability query direct from within test page')
   page_url = window.location.href.split('#')[0];
-  if (page_url.indexOf('test=true') !== -1) {
+  if (window.location.href.indexOf('test=true') !== -1) {
     oab.test = true;
     page_url = page_url.replace('test=true','');
   }
