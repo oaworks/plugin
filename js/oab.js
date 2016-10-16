@@ -80,7 +80,7 @@ var oab = {
     if (api_key !== undefined) http.setRequestHeader("x-apikey", api_key);
     http.onreadystatechange = function() {
       if (http.readyState == XMLHttpRequest.DONE) {
-        http.status === 200 ? success_callback(JSON.parse(http.response)) : failure_callback(JSON.parse(http.response));
+        http.status === 200 ? success_callback(JSON.parse(http.response)) : failure_callback(http);
       }
     }
     http.send(JSON.stringify(this.signPluginVersion(data)));
@@ -99,16 +99,16 @@ var oab = {
 
   handleAPIError: function(data, displayError) {
     var error_text = '';
-    if (data.statusCode === 400) {
+    if (data.status === 400) {
       error_text = 'Sorry, the page you are on is not one that we can check availability for. See the <a href="' + oab.site_address + oab.howto_address + '" id="goto_instructions">instructions</a> for help.';
-    } else if (data.statusCode === 401) {
+    } else if (data.status === 401) {
       error_text = "Unauthorised - check your API key is valid. Go to ";
       error_text += '<a href="' + oab.site_address + oab.register_address + '" id="goto_register">';
       error_text += oab.site_address + oab.register_address + "</a> and sign up if you have not already done so. Once you are signed in the plugin should find your API key for you.";
-    } else if (data.statusCode === 403) {
+    } else if (data.status === 403) {
       error_text = "Forbidden - please file a bug.";
     } else {
-      error_text = data.statusCode + ". Sorry, unknown error, perhaps the system is offline, or you are offline. Please file a bug including this code: " + data.statusCode;
+      error_text = data.status + ". Sorry, unknown error, perhaps the system is offline, or you are offline. Please file a bug including this code: " + data.status;
     }
     if (error_text !== '') {
       oab.displayMessage(error_text, undefined, 'error');
