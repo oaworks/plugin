@@ -111,6 +111,7 @@ var oab = {
       error_text = data.status + ". Sorry, unknown error, perhaps the system is offline, or you are offline. Please file a bug including this code: " + data.status;
     }
     if (error_text !== '') {
+      document.getElementById('loading_area').className = 'row collapse';
       oab.displayMessage(error_text, undefined, 'error');
       if (chrome && chrome.tabs) {
         if ( document.getElementById('goto_instructions') ) {
