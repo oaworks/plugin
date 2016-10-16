@@ -118,11 +118,16 @@ try {
   });
 } catch (err) {
   oab.debug = true;
-  oab.test = true;
   oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
   oab.site_address = 'http://oab.test.cottagelabs.com';
   oab.debugLog('Sending availability query direct from within test page')
   page_url = window.location.href.split('#')[0];
+  if (page_url.indexOf('test=true') !== -1) {
+    oab.test = true;
+    page_url = page_url.replace('test=true','');
+  }
+  if (page_url.indexOf('debug=true') !== -1) page_url = page_url.replace('debug=true','');
+  if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('apikey=')[0];
   oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
 }
 
