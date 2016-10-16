@@ -2,7 +2,8 @@
 
 var oab = {
 
-  debug : false,
+  test : false, // this sends requests with the test parameter set
+  debug : false, // this puts the button in debug mode, issues debug warnings
 
   api_address : 'https://api.openaccessbutton.org',
 
@@ -23,7 +24,7 @@ var oab = {
     } catch (err) {
       data.plugin = 'oab_test_page';
     }
-    if (oab.debug) data.test = true;
+    if (oab.test) data.test = true;
     return data;
   },
 

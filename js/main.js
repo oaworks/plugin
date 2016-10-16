@@ -20,7 +20,6 @@ function handleAvailabilityResponse(response) {
     }
   } else if (response.data.requests.length > 0) {
     for (var requests_entry of response.data.requests) {
-      document.getElementById('icon'+requests_entry.type).style.backgroundColor = '#f04717';
       if (requests_entry.usupport || requests_entry.ucreated) {
         document.getElementById('icon'+requests_entry.type+'button').setAttribute('href',oab.site_address+'/request/'+requests_entry._id);
       } else {
@@ -31,7 +30,6 @@ function handleAvailabilityResponse(response) {
     }
   } else if (response.data.accepts.length > 0) {
     for (var accepts_entry of response.data.accepts) {
-      document.getElementById('icon'+accepts_entry.type).style.backgroundColor = '#f04717';
       document.getElementById('icon'+accepts_entry.type+'button').setAttribute('data-action','create');
       document.getElementById('submit').setAttribute('data-action','create');
     }
@@ -103,24 +101,28 @@ try {
 
 try {
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-    // Check the status of the URL for the current tab
+    // Start by checking the status of the URL for the current tab
     page_url = tabs[0].url.split('#')[0];
-    if (page_url.indexOf('debug=true') !== -1 || page_url.indexOf('test=true') !== -1) {
+    if (page_url.indexOf('debug=true') !== -1) {
       oab.debug = true;
       oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
       oab.site_address = 'http://oab.test.cottagelabs.com';
+      page_url = page_url.replace('debug=true','');
+    }
+    if (page_url.indexOf('test=true') !== -1) {
+      oab.test = true;
+      page_url = page_url.replace('test=true','');
     }
     oab.debugLog('Sending availability query via chrome tabs for URL ' + page_url);
     oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
   });
 } catch (err) {
-  if (window.location.href.indexOf('debug=true') !== -1 || window.location.href.indexOf('test.cottagelabs') !== -1 || window.location.href.indexOf('apikey=') !== -1) {
-    oab.debug = true;
-    oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
-    oab.site_address = 'http://oab.test.cottagelabs.com';
-  }  
+  oab.debug = true;
+  oab.test = true;
+  oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
+  oab.site_address = 'http://oab.test.cottagelabs.com';
   oab.debugLog('Sending availability query direct from within test page')
-  page_url = window.location.href.split('?')[0].split('#')[0];
+  page_url = window.location.href.split('#')[0];
   oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
 }
 
