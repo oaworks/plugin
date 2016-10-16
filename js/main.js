@@ -65,14 +65,6 @@ function handleRequestResponse(response) {
 // These are run when the extension loads
 
 try {
-  if (window.location.href.indexOf('debug=true') !== -1 || window.location.href.indexOf('test.cottagelabs') !== -1 || window.location.href.indexOf('apikey=') !== -1) {
-    oab.debug = true;
-    oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
-    oab.site_address = 'http://oab.test.cottagelabs.com';
-  }
-} catch(err) {}
-
-try {
   chrome.tabs.executeScript({
     code: 'chrome.storage.local.set({dom: document.all[0].outerHTML });'
   });
@@ -83,6 +75,7 @@ noapimsg += ' Please <a id="noapikey" class="label label-info" href="' + oab.sit
 noapimsg += '">signup or login</a> now, and your API key will be automatically retrieved.';
 
 try {
+  // is it worth checking for an api key here? would we want to test as different users by directly passing api key?
   chrome.storage.local.get({api_key : ''}, function(items) {
     if (items.api_key === '') {
       oab.displayMessage(noapimsg);
@@ -111,12 +104,21 @@ try {
 try {
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
     // Check the status of the URL for the current tab
-    page_url = tabs[0].url.split('?')[0].split('#')[0];
+    page_url = tabs[0].url.split('#')[0];
+    if (page_url.indexOf('debug=true') !== -1 || page_url.indexOf('test=true') !== -1) {
+      oab.debug = true;
+      oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
+      oab.site_address = 'http://oab.test.cottagelabs.com';
+    }
     oab.debugLog('Sending availability query via chrome tabs for URL ' + page_url);
     oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
   });
 } catch (err) {
-  // for testing it is useful to send this based on page
+  if (window.location.href.indexOf('debug=true') !== -1 || window.location.href.indexOf('test.cottagelabs') !== -1 || window.location.href.indexOf('apikey=') !== -1) {
+    oab.debug = true;
+    oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
+    oab.site_address = 'http://oab.test.cottagelabs.com';
+  }  
   oab.debugLog('Sending availability query direct from within test page')
   page_url = window.location.href.split('?')[0].split('#')[0];
   oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
