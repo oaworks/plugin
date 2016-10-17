@@ -3,7 +3,7 @@
 var oab = {
 
   test : false, // this sends requests with the test parameter set
-  debug : false, // this puts the button in debug mode, issues debug warnings
+  debug : true, // this puts the button in debug mode, issues debug warnings
 
   api_address : 'https://api.openaccessbutton.org',
 
