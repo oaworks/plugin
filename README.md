@@ -38,14 +38,4 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 * Browse to the project directory you just downloaded, click 'Select'. It will upload the zip file you just downloaded. 
 * If you're experiencing problems with any of these steps, feel free to leave an issue on the backend repository [here](https://github.com/OAButton/backend/issues/new). 
  
-## Dev Testing
-
-IF debug is set to false, then this plugin will talk to the live API. To overcome this, you must add ?debug=true to EVERY 
-URL you try to visit, and then it will talk to the dev API.
-
-NOTE: I HAVE LEFT debug SET TO true FOR CONVENIENCE FOR NOW.
-
-HOWEVER even in debug mode the plugin will now automatically behave as if it is live, meaning it will not allow you to 
-use it on blacklisted sites. If you really want to overcome this too, then add ?test=true to any URL you want to visit. 
-Now you can submit on any URL.
 

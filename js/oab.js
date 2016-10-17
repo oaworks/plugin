@@ -5,9 +5,9 @@ var oab = {
   test : false, // this sends requests with the test parameter set
   debug : true, // this puts the button in debug mode, issues debug warnings
 
-  api_address : 'https://api.openaccessbutton.org',
+  api_address : 'https://dev.api.openaccessbutton.org', // 'https://api.openaccessbutton.org',
 
-  site_address : 'https://openaccessbutton.org',
+  site_address : 'https://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
 
   howto_address : '/howto',
   
@@ -26,7 +26,7 @@ var oab = {
     } catch (err) {
       data.plugin = 'oab_test_page';
     }
-    if (oab.test) data.test = true;
+    if (oab.test || oab.debug) data.test = true;
     return data;
   },
 
