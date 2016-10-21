@@ -7,14 +7,14 @@ var oab = {
 
   api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
 
-  site_address : 'https://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
+  site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
 
   howto_address : '/howto',
-  
+
   register_address : '/account',
   
   bug_address : '/bug',
-  
+
   messages: 'message', // a div ID name to put error messages etc
 
   // Tell the API which plugin version is in use for each POST
@@ -71,8 +71,8 @@ var oab = {
       oab.postToAPI(request_type,key,data,success_callback,error_callback);
     }
   },
-  
-  postToAPI: function(request_type, api_key, data, success_callback, failure_callback) {  
+
+  postToAPI: function(request_type, api_key, data, success_callback, failure_callback) {
     var http = new XMLHttpRequest();
     var url = oab.api_address + request_type;
     http.open("POST", url, true);
