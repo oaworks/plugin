@@ -41,11 +41,18 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 ## Dev params
 
 By default the develop branch will be set to debug=true and test=true, whereas the master branch will be 
-debug=false and test=false. When debug is true, the API used is the dev API, when false it is the live API. 
+debug=false and test=false.
+
+You can change these variables via the URL of the page you are visiting - type in the URL you want to go to, then add a ? if there are no URL paremeters yet, or if there are then add a &. Then type the variable name you want to change, and the value, such as:
+
+https://greatresearch.com?test=true
+
+When debug is true, the API used is the dev API, when false it is the live API. 
 When test is true, queries sent to the API will have test:true key/value pair added to them. 
 
-The main consequence of this is that test queries will be processed even if they are from blacklisted URLs. 
-Otherwise, they can probably just be ignored.
+The main consequence of this is that test queries will be processed even if they are from blacklisted URLs, so if you are testing out the plugin from the dev branch you can change the test parameter value via the URL.
+
+Otherwise, these can probably just be ignored.
 
 
 
