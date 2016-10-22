@@ -38,4 +38,18 @@ Firefox requires extra keys in the manifest, and the project files zip archived 
 * Browse to the project directory you just downloaded, click 'Select'. It will upload the zip file you just downloaded. 
 * If you're experiencing problems with any of these steps, feel free to leave an issue on the backend repository [here](https://github.com/OAButton/backend/issues/new). 
  
+## Dev params
+
+By default the develop branch will be set to debug=true and test=true, whereas the master branch will be 
+debug=false and test=false. When debug is true, the API used is the dev API, when false it is the live API. 
+When test is true, queries sent to the API will have test:true key/value pair added to them. 
+
+The main consequence of this is that test queries will be processed even if they are from blacklisted URLs. 
+Otherwise, they can probably just be ignored.
+
+
+
+
+
+
 

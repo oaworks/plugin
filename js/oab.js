@@ -2,14 +2,18 @@
 
 var oab = {
 
-  test : false, // this sends requests with the test parameter set
   debug : true, // this puts the button in debug mode, issues debug warnings
+  test : true, // whether or not to create requests that are marked as test
+  
+  api_address : function() {
+    return oab.debug ? 'https://dev.api.cottagelabs.com/service/oab' : 'https://api.openaccessbutton.org';
+  },
 
-  api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
+  site_address : function() {
+    return oab.debug ? 'http://oab.test.cottagelabs.com' : 'https://openaccessbutton.org';
+  },
 
-  site_address : 'https://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
-
-  howto_address : '/howto',
+  howto_address : '/instructions',
   
   register_address : '/account',
   
@@ -26,7 +30,7 @@ var oab = {
     } catch (err) {
       data.plugin = 'oab_test_page';
     }
-    if (oab.test || oab.debug) data.test = true;
+    if (oab.test) data.test = true;
     return data;
   },
 
@@ -129,7 +133,7 @@ var oab = {
     }
   },
 
-  debugLog : function(message) {
+  debugLog: function(message) {
     if (oab.debug) {
       console.log(message)
     }

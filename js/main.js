@@ -14,23 +14,26 @@ function handleAvailabilityResponse(response) {
   
   // Change the UI depending on availability, existing requests, and the data types we can open new requests for.
   if (response.data.availability.length > 0) {
+    var title = 'We found it! Click to open';
     for ( var i = 0; i < response.data.availability.length; i++ ) {
       document.getElementById('icon'+response.data.availability[i].type).style.backgroundColor = '#398bc5';
-      document.getElementById('icon'+response.data.availability[i].type+'button').setAttribute('href',response.data.availability[i].url);
+      document.getElementById('icon'+response.data.availability[i].type).setAttribute('alt',title);
+      document.getElementById('icon'+response.data.availability[i].type).setAttribute('title',title);
+      document.getElementById('icon'+response.data.availability[i].type).setAttribute('href',response.data.availability[i].url);
     }
   } else if (response.data.requests.length > 0) {
     for (var requests_entry of response.data.requests) {
       if (requests_entry.usupport || requests_entry.ucreated) {
-        document.getElementById('icon'+requests_entry.type+'button').setAttribute('href',oab.site_address+'/request/'+requests_entry._id);
+        document.getElementById('icon'+requests_entry.type).setAttribute('href',oab.site_address+'/request/'+requests_entry._id);
       } else {
-        document.getElementById('icon'+requests_entry.type+'button').setAttribute('data-action','support');
+        document.getElementById('icon'+requests_entry.type).setAttribute('data-action','support');
         document.getElementById('submit').setAttribute('data-action','support');
         document.getElementById('submit').setAttribute('data-support',requests_entry._id);
       }
     }
   } else if (response.data.accepts.length > 0) {
     for (var accepts_entry of response.data.accepts) {
-      document.getElementById('icon'+accepts_entry.type+'button').setAttribute('data-action','create');
+      document.getElementById('icon'+accepts_entry.type).setAttribute('data-action','create');
       document.getElementById('submit').setAttribute('data-action','create');
     }
   } else {
@@ -105,7 +108,11 @@ try {
     page_url = tabs[0].url.split('#')[0];
     if (tabs[0].url.indexOf('test=true') !== -1) {
       oab.test = true;
-      page_url = page_url.replace('test=true','');
+      page_url = page_url.replace('?test=true','').replace('&test=true','').replace('test=true','');
+    }
+    if (tabs[0].url.indexOf('test=false') !== -1) {
+      oab.test = false;
+      page_url = page_url.replace('?test=false','').replace('&test=false','').replace('test=false','');
     }
     oab.debugLog('Sending availability query via chrome tabs for URL ' + page_url);
     oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
@@ -114,13 +121,17 @@ try {
   oab.debug = true;
   oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
   oab.site_address = 'http://oab.test.cottagelabs.com';
-  oab.debugLog('Sending availability query direct from within test page')
+  oab.debugLog('Sending availability query direct from within test page');
   page_url = window.location.href.split('#')[0];
   if (window.location.href.indexOf('test=true') !== -1) {
     oab.test = true;
-    page_url = page_url.replace('test=true','');
+    page_url = page_url.replace('?test=true','').replace('&test=true','').replace('test=true','');
   }
-  if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('apikey=')[0];
+  if (window.location.href.indexOf('test=false') !== -1) {
+    oab.test = false;
+    page_url = page_url.replace('?test=false','').replace('&test=false','').replace('test=false','');
+  }
+  if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('?apikey=')[0].split('&apikey=')[0].split('apikey=')[0];
   oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
 }
 
@@ -131,10 +142,14 @@ try {
 var needs = document.getElementsByClassName('need');
 for ( var n in needs ) {
   needs[n].onclick = function(e) {
-    if ( e.target.parentNode.getAttribute('href') === '#' && api_key ) {
+    var href = e.target.getAttribute('href');
+    if (!href) href = e.target.parentNode.getAttribute('href');
+    if ( href === '#' && api_key ) {
       e.preventDefault();
-      var action = e.target.parentNode.getAttribute('data-action');
-      var type = e.target.parentNode.getAttribute('data-type');
+      var action = e.target.getAttribute('data-action');
+      if (!action) action = e.target.parentNode.getAttribute('data-action');
+      var type = e.target.getAttribute('data-type');
+      if (!type) type = e.target.parentNode.getAttribute('data-type');
       var ask = action === 'support' ? 'There is an open request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
       ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
       document.getElementById('story').setAttribute('placeholder',ask);
@@ -145,6 +160,8 @@ for ( var n in needs ) {
         document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('support','create');
       }
       document.getElementById('story_div').className = document.getElementById('story_div').className.replace('collapse','').replace('  ',' ');
+    } else if (chrome && chrome.tabs) {
+      chrome.tabs.create({'url': e.target.getAttribute('href')});
     }
   }
 }
