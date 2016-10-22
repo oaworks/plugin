@@ -1,8 +1,8 @@
 {
   "name": "Open Access Button",
-  "version": "0.0.46",
-  "version_name": "oab_unified_0.0.46",
-  "manifest_version": 46,
+  "version": "0.1.0",
+  "version_name": "oab_unified_0.1.0",
+  "manifest_version": 1,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": {
     "128": "img/oa128.png"
