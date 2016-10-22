@@ -18,7 +18,7 @@ function do_auth() {
       if ( foundkey ) {
         save_auth();
       } else {
-        document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-action"><p>We couldn\'t connect your account and plugin, something is up</p></div>';
+        document.getElementById('plugin_messages').innerHTML = '<div class="alert alert-action"><p>We couldn\'t connect your account and plugin, something is up. Email help@openaccessbutton.org</p></div>';
       }
     } else if ( foundkey && foundkey !== items.api_key ) {
       var html = '<div class="alert alert-action"><p>The account associated with your installed plugin isn\'t the same as this account, do you want to change it?</p>';
