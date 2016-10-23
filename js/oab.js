@@ -4,7 +4,7 @@ var oab = {
 
   debug : true, // this puts the button in debug mode, issues debug warnings
   
-  api_address : 'https://dev.apide.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
+  api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
   
   site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
 
