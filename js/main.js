@@ -38,7 +38,7 @@ function handleAvailabilityResponse(response) {
       }
       document.getElementById('submit').setAttribute('data-support',requests_entry._id);
       var rnd = document.getElementById('icon'+requests_entry.type).innerHTML;
-      rnd = rnd.replace('Unavailable','Support '+requests_entry.type);
+      rnd = rnd.replace('Unavailable','Support request');
       document.getElementById('icon'+requests_entry.type).innerHTML = rnd;
     }
   } else if (response.data.accepts.length > 0) {
