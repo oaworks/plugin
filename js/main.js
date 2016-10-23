@@ -173,7 +173,7 @@ for ( var n in needs ) {
         document.getElementById('story_div').className = '';
       }
     } else if (chrome && chrome.tabs && api_key) {
-      chrome.tabs.create({'url': e.target.getAttribute('href')});
+      chrome.tabs.create({'url': href});
     } else {
       e.preventDefault();
     }
