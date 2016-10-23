@@ -24,7 +24,7 @@ Quick guide:
 Firefox requires extra keys in the manifest, and the project files zip archived with extension ```.xpi```. The script ```pack_ffx.py``` does this. Supply the required [extension ID](https://developer.mozilla.org/en-US/Add-ons/Install_Manifests#id).
 ```./pack_ffx.py -i oab-ffx@openaccessbutton.org```
 
-## Plugin Install from development
+## Install from development
 
 If you just want to see something quickly, it may be easier to use the [testing site](oabe.test.cottagelabs.com/html/main.html).
 
