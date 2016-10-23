@@ -3,15 +3,15 @@
 var oab = {
 
   debug : true, // this puts the button in debug mode, issues debug warnings
-  
+
   api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
-  
+
   site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
 
   howto_address : '/instructions',
-  
+
   register_address : '/account',
-  
+
   bug_address : '/bug',
 
   messages: 'message', // a div ID name to put error messages etc
@@ -101,15 +101,15 @@ var oab = {
     document.getElementById('icon_loading').className = 'collapse';
     var error_text = '';
     if (data.status === 400) {
-      error_text = 'Sorry, the page you are on is not one that we can check availability for. See the <a href="' + oab.site_address + oab.howto_address + '" id="goto_instructions">instructions</a> for help.';
+      error_text = 'Sorry, the Button does not work on pages like this. You might want to check the <a href="' + oab.site_address + oab.howto_address + '" id="goto_instructions">instructions</a> for help. If you think it should work here, <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
     } else if (data.status === 401) {
-      error_text = "Unauthorised - check your API key is valid. Go to ";
+      error_text = "You need an account for this. Go to ";
       error_text += '<a href="' + oab.site_address + oab.register_address + '" id="goto_register">';
-      error_text += oab.site_address + oab.register_address + "</a> and sign up if you have not already done so. Once you are signed in the plugin should find your API key for you.";
+      error_text += oab.site_address + oab.register_address + "</a> and either sign up or sign in - then your plugin will work.";
     } else if (data.status === 403) {
-      error_text = "Forbidden - please file a bug.";
+      error_text = "Something is wrong,  please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.";
     } else {
-      error_text = data.status + '. Sorry, unknown error, perhaps the system is offline, or you are offline. Please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
+      error_text = data.status + '. Hmm, we are not sure what is happening.  You or the system may be offline. Please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
     }
     if (error_text !== '') {
       error_text = '<p><img src="../img/error.png" style="margin:5px auto 10px 100px;"></p>' + error_text;

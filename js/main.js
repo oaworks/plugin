@@ -11,7 +11,7 @@ function handleAvailabilityResponse(response) {
 
   document.getElementById('buttonstatus').className = document.getElementById('buttonstatus').className.replace('collapse','').replace('  ',' ');
   document.getElementById('loading_area').className = 'row collapse';
-  
+
   // Change the UI depending on availability, existing requests, and the data types we can open new requests for.
   if (response.data.availability.length > 0) {
     var title = 'We found it! Click to open';
@@ -31,7 +31,7 @@ function handleAvailabilityResponse(response) {
         document.getElementById('submit').setAttribute('data-action','supported');
       } else if (requests_entry.ucreated) {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','created');
-        document.getElementById('submit').setAttribute('data-action','created');        
+        document.getElementById('submit').setAttribute('data-action','created');
       } else {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','support');
         document.getElementById('submit').setAttribute('data-action','support');
@@ -62,11 +62,11 @@ function handleRequestResponse(response) {
   document.getElementById('story_div').className += ' collapse';
   document.getElementById('story').value = "";
   var url = oab.site_address + '/request/' + response._id;
-  var msg = "<p>Thanks very much for ";
+  var msg = "<p>Thank you for ";
   msg += document.getElementById('submit').getAttribute('data-action') === 'create' ? 'creat' : 'support';
   msg += "ing this request!</p>";
-  msg += "<p>Please take a moment to go and view the request, and provide any additional support that you can.</p>"
-  msg += '<p>We have opened it up in a new tab for you. If your browser blocked it, you can open it <a class="label label-info" target="_blank" href="' + url + '">here</a>';
+  msg += "<p>Please go and view the request, it may need additional details.</p>"
+  msg += '<p>It should be open in a new tab, but if you do not see it <a class="label label-info" target="_blank" href="' + url + '">click here</a>';
   document.getElementById('message').innerHTML = msg;
   try {
     chrome.tabs.create({url: url, active: false});
@@ -87,7 +87,7 @@ try {
   });
 } catch(err) {}
 
-var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
+var noapimsg = "You don't appear to be signed up. If you sign up you can create requests and more.";
 noapimsg += '<br>Please <a id="noapikey" class="label" style="background-color:#398bc5;" href="' + oab.site_address + oab.register_address;
 noapimsg += '">signup or login</a> now.';
 
@@ -158,7 +158,7 @@ for ( var n in needs ) {
         if (chrome && chrome.tabs) {
           document.getElementById('goto_request').onclick = function () {
             chrome.tabs.create({'url': oab.site_address + '/request/' + rid});
-          };          
+          };
         }
       } else {
         var ask = action === 'support' ? 'There is an open request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
@@ -211,12 +211,12 @@ document.getElementById('story').onkeyup = function () {
     left = 0;
   }
   if (length === 0) {
-    document.getElementById('submit').innerHTML = 'Tell us your story in up to <br><span id="counter">25</span> words to support this request';
-    document.getElementById('submit').style.backgroundColor = '#f04717'; 
+    document.getElementById('submit').innerHTML = 'Say why you need this in up to <br><span id="counter">25</span> words to support this request';
+    document.getElementById('submit').style.backgroundColor = '#f04717';
   }
   if (length <= 5) {
-    document.getElementById('submit').innerHTML = 'Tell us your story with up to <span id="counter"></span><br> more words to support this request';
-    document.getElementById('submit').style.backgroundColor = '#f04717'; 
+    document.getElementById('submit').innerHTML = 'Tell us your reason with up to <span id="counter"></span><br> more words to support this request';
+    document.getElementById('submit').style.backgroundColor = '#f04717';
   }
   if ( left < 25 && length > 5 ) {
     document.getElementById('submit').removeAttribute('disabled');
@@ -224,18 +224,16 @@ document.getElementById('story').onkeyup = function () {
     document.getElementById('submit').setAttribute('disabled',true);
   }
   if (length > 5 && length <= 10) {
-    document.getElementById('submit').innerHTML = 'Great, <span id="counter"></span> words remaining!<br>Write 5 more?';
-    document.getElementById('submit').style.backgroundColor = '#ffff66'; 
+    document.getElementById('submit').innerHTML = 'Great, <span id="counter"></span> words remaining!<br>Write a few more?';
+    document.getElementById('submit').style.backgroundColor = '#ffff66';
   }
   if (length > 10 && length <= 20) {
     document.getElementById('submit').innerHTML = '<span id="counter"></span> words left! Or click to submit<br>now and create your request!';
-    document.getElementById('submit').style.backgroundColor = '#99ff99'; 
+    document.getElementById('submit').style.backgroundColor = '#99ff99';
   }
   if (length > 20) {
-    document.getElementById('submit').innerHTML = '<span id="counter"></span>... Click now to submit your<br>story and create your request';
-    document.getElementById('submit').style.backgroundColor = '#99ff99'; 
+    document.getElementById('submit').innerHTML = '<span id="counter"></span>... Click now to submit your<br>reason and create your request';
+    document.getElementById('submit').style.backgroundColor = '#99ff99';
   }
   document.getElementById('counter').innerHTML = left;
 };
-
-
