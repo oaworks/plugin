@@ -161,7 +161,7 @@ for ( var n in needs ) {
           };
         }
       } else {
-        var ask = action === 'support' ? 'There is an open request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
+        var ask = action === 'support' ? 'Someone else has started a request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
         ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
         document.getElementById('story').setAttribute('placeholder',ask);
         document.getElementById('submit').setAttribute('data-type',type);
