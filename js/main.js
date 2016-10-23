@@ -106,14 +106,6 @@ try {
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
     // Start by checking the status of the URL for the current tab
     page_url = tabs[0].url.split('#')[0];
-    if (tabs[0].url.indexOf('test=true') !== -1) {
-      oab.test = true;
-      page_url = page_url.replace('?test=true','').replace('&test=true','').replace('test=true','');
-    }
-    if (tabs[0].url.indexOf('test=false') !== -1) {
-      oab.test = false;
-      page_url = page_url.replace('?test=false','').replace('&test=false','').replace('test=false','');
-    }
     oab.debugLog('Sending availability query via chrome tabs for URL ' + page_url);
     oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
   });
@@ -123,14 +115,6 @@ try {
   oab.site_address = 'http://oab.test.cottagelabs.com';
   oab.debugLog('Sending availability query direct from within test page');
   page_url = window.location.href.split('#')[0];
-  if (window.location.href.indexOf('test=true') !== -1) {
-    oab.test = true;
-    page_url = page_url.replace('?test=true','').replace('&test=true','').replace('test=true','');
-  }
-  if (window.location.href.indexOf('test=false') !== -1) {
-    oab.test = false;
-    page_url = page_url.replace('?test=false','').replace('&test=false','').replace('test=false','');
-  }
   if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('?apikey=')[0].split('&apikey=')[0].split('apikey=')[0];
   oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
 }
