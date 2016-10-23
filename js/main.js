@@ -20,6 +20,9 @@ function handleAvailabilityResponse(response) {
       document.getElementById('icon'+response.data.availability[i].type).setAttribute('alt',title);
       document.getElementById('icon'+response.data.availability[i].type).setAttribute('title',title);
       document.getElementById('icon'+response.data.availability[i].type).setAttribute('href',response.data.availability[i].url);
+      var nd = document.getElementById('icon'+response.data.availability[i].type).innerHTML;
+      nd = nd.replace('Open','Get');
+      document.getElementById('icon'+response.data.availability[i].type).innerHTML = nd;
     }
   } else if (response.data.requests.length > 0) {
     for (var requests_entry of response.data.requests) {
