@@ -141,6 +141,9 @@ for ( var n in needs ) {
   needs[n].onclick = function(e) {
     var href = e.target.getAttribute('href');
     if (!href) href = e.target.parentNode.getAttribute('href');
+    var type = e.target.getAttribute('data-type');
+    if (!type) type = e.target.parentNode.getAttribute('data-type');
+    document.getElementById('story_div').className = 'collapse';
     oab.displayMessage('');
     if ( href === '#' && api_key ) {
       e.preventDefault();
@@ -149,8 +152,8 @@ for ( var n in needs ) {
       if (action === 'created' || action === 'supported') {
         var rid = document.getElementById('submit').getAttribute('data-support');
         var u = oab.site_address + 'request/' + rid;
-        var dm = '<p>You already ' + action + ' a request for this.<br>';
-        dm += '<a id="goto_request" href="' + u + '">' + u + '</a></p>';
+        var dm = '<p>You already ' + action + ' a request for this ' + type + '.<br>';
+        dm += '<a id="goto_request" href="' + u + '">open request ' + rid + '</a></p>';
         oab.displayMessage(dm);
         if (chrome && chrome.tabs) {
           document.getElementById('goto_request').onclick = function () {
@@ -158,8 +161,6 @@ for ( var n in needs ) {
           };          
         }
       } else {
-        var type = e.target.getAttribute('data-type');
-        if (!type) type = e.target.parentNode.getAttribute('data-type');
         var ask = action === 'support' ? 'There is an open request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
         ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
         document.getElementById('story').setAttribute('placeholder',ask);
@@ -169,7 +170,7 @@ for ( var n in needs ) {
         } else {
           document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('support','create');
         }
-        document.getElementById('story_div').className = document.getElementById('story_div').className.replace('collapse','').replace('  ',' ');
+        document.getElementById('story_div').className = '';
       }
     } else if (chrome && chrome.tabs && api_key) {
       chrome.tabs.create({'url': e.target.getAttribute('href')});
