@@ -151,12 +151,12 @@ for ( var n in needs ) {
         var u = oab.site_address + 'request/' + rid;
         var dm = '<p>You already ' + action + ' a request for this.<br>';
         dm += '<a id="goto_request" href="' + u + '">' + u + '</a></p>';
+        oab.displayMessage(dm);
         if (chrome && chrome.tabs) {
           document.getElementById('goto_request').onclick = function () {
             chrome.tabs.create({'url': oab.site_address + 'request/' + rid});
           };          
         }
-        oab.displayMessage(dm);
       } else {
         var type = e.target.getAttribute('data-type');
         if (!type) type = e.target.parentNode.getAttribute('data-type');
