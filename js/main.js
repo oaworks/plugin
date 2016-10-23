@@ -87,7 +87,7 @@ try {
   });
 } catch(err) {}
 
-var noapimsg = "You don't appear to be signed up. If you sign up you can create requests and more.";
+var noapimsg = "You don't appear to be signed up. If you sign up you can create and support requests.";
 noapimsg += '<br>Please <a id="noapikey" class="label" style="background-color:#398bc5;" href="' + oab.site_address + oab.register_address;
 noapimsg += '">signup or login</a> now.';
 
