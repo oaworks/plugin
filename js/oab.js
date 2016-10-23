@@ -4,7 +4,7 @@ var oab = {
 
   debug : true, // this puts the button in debug mode, issues debug warnings
   
-  api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
+  api_address : 'https://dev.apide.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
   
   site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
 
@@ -97,6 +97,8 @@ var oab = {
   },
 
   handleAPIError: function(data, displayError) {
+    document.getElementById('icon_submitting').className = 'collapse';
+    document.getElementById('icon_loading').className = 'collapse';
     var error_text = '';
     if (data.status === 400) {
       error_text = 'Sorry, the page you are on is not one that we can check availability for. See the <a href="' + oab.site_address + oab.howto_address + '" id="goto_instructions">instructions</a> for help.';
@@ -107,7 +109,7 @@ var oab = {
     } else if (data.status === 403) {
       error_text = "Forbidden - please file a bug.";
     } else {
-      error_text = data.status + ". Sorry, unknown error, perhaps the system is offline, or you are offline. Please file a bug including this code: " + data.status;
+      error_text = data.status + '. Sorry, unknown error, perhaps the system is offline, or you are offline. Please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
     }
     if (error_text !== '') {
       error_text = '<p><img src="../img/error.png" style="margin:5px auto 10px 100px;"></p>' + error_text;
@@ -117,6 +119,11 @@ var oab = {
         if ( document.getElementById('goto_instructions') ) {
           document.getElementById('goto_instructions').onclick = function () {
             chrome.tabs.create({'url': oab.site_address + oab.howto_address});
+          };
+        }
+        if ( document.getElementById('goto_bug') ) {
+          document.getElementById('goto_bug').onclick = function () {
+            chrome.tabs.create({'url': oab.site_address + oab.bug_address});
           };
         }
         if ( document.getElementById('goto_register') ) {

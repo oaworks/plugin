@@ -15,14 +15,14 @@ function handleAvailabilityResponse(response) {
   // Change the UI depending on availability, existing requests, and the data types we can open new requests for.
   if (response.data.availability.length > 0) {
     var title = 'We found it! Click to open';
-    for ( var i = 0; i < response.data.availability.length; i++ ) {
-      document.getElementById('icon'+response.data.availability[i].type).style.backgroundColor = '#398bc5';
-      document.getElementById('icon'+response.data.availability[i].type).setAttribute('alt',title);
-      document.getElementById('icon'+response.data.availability[i].type).setAttribute('title',title);
-      document.getElementById('icon'+response.data.availability[i].type).setAttribute('href',response.data.availability[i].url);
-      var nd = document.getElementById('icon'+response.data.availability[i].type).innerHTML;
-      nd = nd.replace('Request','Open');
-      document.getElementById('icon'+response.data.availability[i].type).innerHTML = nd;
+    for ( var avail_entry of response.data.availability ) {
+      document.getElementById('icon'+avail_entry.type).style.backgroundColor = '#398bc5';
+      document.getElementById('icon'+avail_entry.type).setAttribute('alt',title);
+      document.getElementById('icon'+avail_entry.type).setAttribute('title',title);
+      document.getElementById('icon'+avail_entry.type).setAttribute('href',avail_entry.url);
+      var nd = document.getElementById('icon'+avail_entry.type).innerHTML;
+      nd = nd.replace('Unavailable','Open '+avail_entry.type);
+      document.getElementById('icon'+avail_entry.type).innerHTML = nd;
     }
   } else if (response.data.requests.length > 0) {
     for (var requests_entry of response.data.requests) {
@@ -32,12 +32,20 @@ function handleAvailabilityResponse(response) {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','support');
         document.getElementById('submit').setAttribute('data-action','support');
         document.getElementById('submit').setAttribute('data-support',requests_entry._id);
+        var rnd = document.getElementById('icon'+requests_entry.type).innerHTML;
+        rnd = rnd.replace('Unavailable','Support '+requests_entry.type);
+        document.getElementById('icon'+requests_entry.type).innerHTML = rnd;
       }
     }
   } else if (response.data.accepts.length > 0) {
     for (var accepts_entry of response.data.accepts) {
       document.getElementById('icon'+accepts_entry.type).setAttribute('data-action','create');
       document.getElementById('submit').setAttribute('data-action','create');
+      if (api_key) {
+        var and = document.getElementById('icon'+accepts_entry.type).innerHTML;
+        and = and.replace('Unavailable','Request '+accepts_entry.type);
+        document.getElementById('icon'+accepts_entry.type).innerHTML = and;
+      }
     }
   } else {
     oab.debugLog("The API sent a misshapen response to our availability request.");
@@ -46,6 +54,7 @@ function handleAvailabilityResponse(response) {
 }
 
 function handleRequestResponse(response) {
+  document.getElementById('icon_submitting').className = 'collapse';
   document.getElementById('story_div').className += ' collapse';
   document.getElementById('story').value = "";
   var url = oab.site_address + '/request/' + response._id;
@@ -75,8 +84,8 @@ try {
 } catch(err) {}
 
 var noapimsg = "You don't appear to be signed up yet! If you sign up you can create and support requests, and more.";
-noapimsg += ' Please <a id="noapikey" class="label label-info" href="' + oab.site_address + oab.register_address;
-noapimsg += '">signup or login</a> now, and your API key will be automatically retrieved.';
+noapimsg += '<br>Please <a id="noapikey" class="label" style="background-color:#398bc5;" href="' + oab.site_address + oab.register_address;
+noapimsg += '">signup or login</a> now.';
 
 try {
   // is it worth checking for an api key here? would we want to test as different users by directly passing api key?
@@ -113,9 +122,6 @@ try {
     oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
   });
 } catch (err) {
-  oab.debug = true;
-  oab.api_address = 'https://dev.api.cottagelabs.com/service/oab';
-  oab.site_address = 'http://oab.test.cottagelabs.com';
   oab.debugLog('Sending availability query direct from within test page');
   page_url = window.location.href.split('#')[0];
   if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('?apikey=')[0].split('&apikey=')[0].split('apikey=')[0];
@@ -147,13 +153,17 @@ for ( var n in needs ) {
         document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('support','create');
       }
       document.getElementById('story_div').className = document.getElementById('story_div').className.replace('collapse','').replace('  ',' ');
-    } else if (chrome && chrome.tabs) {
+    } else if (chrome && chrome.tabs && api_key) {
       chrome.tabs.create({'url': e.target.getAttribute('href')});
+    } else {
+      e.preventDefault();
     }
   }
 }
 
 document.getElementById('submit').onclick = function (e) {
+  document.getElementById('submit').className = 'collapse';
+  document.getElementById('icon_submitting').className = '';
   var data = {
     story: document.getElementById('story').value
   };
@@ -174,13 +184,6 @@ document.getElementById('submit').onclick = function (e) {
     oab.sendSupportPost(api_key, data, handleRequestResponse, oab.handleAPIError);
   }
 };
-
-document.getElementById('bug').setAttribute('href',oab.site_address + oab.bug_address);
-if (chrome && chrome.tabs) {
-  document.getElementById('bug').onclick = function () {
-    chrome.tabs.create({'url': oab.site_address + oab.bug_address});
-  };
-}
 
 document.getElementById('story').onkeyup = function () {
   var length = document.getElementById('story').value.replace(/  +/g,' ').split(' ').length;
