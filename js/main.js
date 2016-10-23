@@ -36,7 +36,6 @@ function handleAvailabilityResponse(response) {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','support');
         document.getElementById('submit').setAttribute('data-action','support');
       }
-document.getElementById('icon'+requests_entry.type).setAttribute('href',oab.site_address+'/request/'+requests_entry._id);
       document.getElementById('submit').setAttribute('data-support',requests_entry._id);
       var rnd = document.getElementById('icon'+requests_entry.type).innerHTML;
       rnd = rnd.replace('Unavailable','Support '+requests_entry.type);
