@@ -24,7 +24,8 @@ function handleAvailabilityResponse(response) {
       nd = nd.replace('Unavailable','Open '+avail_entry.type);
       document.getElementById('icon'+avail_entry.type).innerHTML = nd;
     }
-  } else if (response.data.requests.length > 0) {
+  }
+  if (response.data.requests.length > 0) {
     for (var requests_entry of response.data.requests) {
       if (requests_entry.usupport) {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','supported');
@@ -41,7 +42,8 @@ function handleAvailabilityResponse(response) {
       rnd = rnd.replace('Unavailable','Support request');
       document.getElementById('icon'+requests_entry.type).innerHTML = rnd;
     }
-  } else if (response.data.accepts.length > 0) {
+  }
+  if (response.data.accepts.length > 0) {
     for (var accepts_entry of response.data.accepts) {
       document.getElementById('icon'+accepts_entry.type).setAttribute('data-action','create');
       document.getElementById('submit').setAttribute('data-action','create');
@@ -51,9 +53,6 @@ function handleAvailabilityResponse(response) {
         document.getElementById('icon'+accepts_entry.type).innerHTML = and;
       }
     }
-  } else {
-    oab.debugLog("The API sent a misshapen response to our availability request.");
-    oab.displayMessage("Sorry, something went wrong with the API.")
   }
 }
 
@@ -153,7 +152,7 @@ for ( var n in needs ) {
         var rid = document.getElementById('submit').getAttribute('data-support');
         var u = oab.site_address + '/request/' + rid;
         var dm = '<p>You already ' + action + ' a request for this ' + type + '.<br>';
-        dm += '<a id="goto_request" href="' + u + '">open request ' + rid + '</a></p>';
+        dm += '<a id="goto_request" href="' + u + '">open the request </a></p>';
         oab.displayMessage(dm);
         if (chrome && chrome.tabs) {
           document.getElementById('goto_request').onclick = function () {
