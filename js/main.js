@@ -165,7 +165,7 @@ for ( var n in needs ) {
         oab.displayMessage(dm);
         if (chrome && chrome.tabs) {
           document.getElementById('goto_request').onclick = function () {
-            chrome.tabs.create({'url': oab.site_address + '/request/' + rid});
+            chrome.tabs.create({'url': oab.site_address + '/request/' + supports});
           };
         }
       } else {
