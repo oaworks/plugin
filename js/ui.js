@@ -1,9 +1,8 @@
 
-var oabutton_ui = function() {
+var oabutton_ui = function(api_key) {
   // =============================================
   // declare vars and functions
 
-  var api_key;
   var page_url;
 
   function handleAvailabilityResponse(response) {
@@ -134,7 +133,7 @@ var oabutton_ui = function() {
       // this is just useful for testing...
       oab.debugLog('Got api key ' + apik + ' direct from url param for testing');
       api_key = apik;
-    } else {
+    } else if (!api_key) {
       oab.displayMessage('(you are on the test page - you can provide an apikey url param to override this msg).<br>' + noapimsg);
     }
     start();
