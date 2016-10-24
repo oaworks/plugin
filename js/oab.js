@@ -4,6 +4,8 @@ var oab = {
 
   debug : true, // this puts the button in debug mode, issues debug warnings
 
+  bookmarklet : false, // this lib is also used by a bookmarklet, which sets this to change plugin type
+  
   api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
 
   site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
@@ -22,6 +24,7 @@ var oab = {
     try {
       var manifest = chrome.runtime.getManifest();
       data.plugin = manifest.version_name;
+      if (oab.bookmarklet) data.plugin = 'bookmarklet_' + data.plugin;
     } catch (err) {
       data.plugin = 'oab_test_page';
     }
@@ -29,8 +32,8 @@ var oab = {
     return data;
   },
 
-  sendAvailabilityQuery: function(api_key, url, success_callback, failure_callback) {
-    oab.postLocated('/availability', api_key, { url: url }, success_callback, failure_callback)
+  sendAvailabilityQuery: function(api_key, data, success_callback, failure_callback) {
+    oab.postLocated('/availability', api_key, data, success_callback, failure_callback)
   },
 
   sendRequestPost: function(api_key, data, success_callback, failure_callback) {

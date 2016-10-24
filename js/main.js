@@ -29,15 +29,12 @@ function handleAvailabilityResponse(response) {
     for (var requests_entry of response.data.requests) {
       if (requests_entry.usupport) {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','supported');
-        document.getElementById('submit').setAttribute('data-action','supported');
       } else if (requests_entry.ucreated) {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','created');
-        document.getElementById('submit').setAttribute('data-action','created');
       } else {
         document.getElementById('icon'+requests_entry.type).setAttribute('data-action','support');
-        document.getElementById('submit').setAttribute('data-action','support');
       }
-      document.getElementById('submit').setAttribute('data-support',requests_entry._id);
+      document.getElementById('icon'+requests_entry.type).setAttribute('data-support',requests_entry._id);
       var rnd = document.getElementById('icon'+requests_entry.type).innerHTML;
       rnd = rnd.replace('Unavailable','Support request');
       document.getElementById('icon'+requests_entry.type).innerHTML = rnd;
@@ -46,7 +43,6 @@ function handleAvailabilityResponse(response) {
   if (response.data.accepts.length > 0) {
     for (var accepts_entry of response.data.accepts) {
       document.getElementById('icon'+accepts_entry.type).setAttribute('data-action','create');
-      document.getElementById('submit').setAttribute('data-action','create');
       if (api_key) {
         var and = document.getElementById('icon'+accepts_entry.type).innerHTML;
         and = and.replace('Unavailable','Request '+accepts_entry.type);
@@ -96,13 +92,21 @@ var start = function() {
       // Start by checking the status of the URL for the current tab
       page_url = tabs[0].url.split('#')[0];
       oab.debugLog('Sending availability query via chrome tabs for URL ' + page_url);
-      oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
+      var qry = {url:page_url};
+      try {
+        chrome.storage.local.get({dom : ''}, function(items) {
+          if (items.dom !== '') qry.dom = items.dom;
+          oab.sendAvailabilityQuery(api_key, qry, handleRequestResponse, oab.handleAPIError);
+        });
+      } catch (err) {
+        oab.sendAvailabilityQuery(api_key, qry, handleRequestResponse, oab.handleAPIError);
+      }
     });
   } catch (err) {
     oab.debugLog('Sending availability query direct from within test page');
     page_url = window.location.href.split('#')[0];
     if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('?apikey=')[0].split('&apikey=')[0].split('apikey=')[0];
-    oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
+    oab.sendAvailabilityQuery(api_key, {url:page_url}, handleAvailabilityResponse, oab.handleAPIError);
   }
 }
 
@@ -146,6 +150,8 @@ for ( var n in needs ) {
     if (!href) href = e.target.parentNode.getAttribute('href');
     var type = e.target.getAttribute('data-type');
     if (!type) type = e.target.parentNode.getAttribute('data-type');
+    var supports = e.target.getAttribute('data-support');
+    if (!supports) type = e.target.parentNode.getAttribute('data-support');
     document.getElementById('story_div').className = 'collapse';
     oab.displayMessage('');
     if ( href === '#' && api_key ) {
@@ -168,6 +174,8 @@ for ( var n in needs ) {
         ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
         document.getElementById('story').setAttribute('placeholder',ask);
         document.getElementById('submit').setAttribute('data-type',type);
+        document.getElementById('submit').setAttribute('data-support',supports);
+        document.getElementById('submit').setAttribute('data-action',action);
         if ( action === 'support' ) {
           document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('create','support');
         } else {
