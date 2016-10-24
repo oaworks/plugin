@@ -96,10 +96,10 @@ var start = function() {
       try {
         chrome.storage.local.get({dom : ''}, function(items) {
           if (items.dom !== '') qry.dom = items.dom;
-          oab.sendAvailabilityQuery(api_key, qry, handleRequestResponse, oab.handleAPIError);
+          oab.sendAvailabilityQuery(api_key, qry, handleAvailabilityResponse, oab.handleAPIError);
         });
       } catch (err) {
-        oab.sendAvailabilityQuery(api_key, qry, handleRequestResponse, oab.handleAPIError);
+        oab.sendAvailabilityQuery(api_key, qry, handleAvailabilityResponse, oab.handleAPIError);
       }
     });
   } catch (err) {
