@@ -90,17 +90,34 @@ var noapimsg = "You don't appear to be signed up. If you sign up you can create 
 noapimsg += '<br>Please <a id="noapikey" class="label" style="background-color:#398bc5;" href="' + oab.site_address + oab.register_address;
 noapimsg += '">signup or login</a> now.';
 
+var start = function() {
+  try {
+    chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+      // Start by checking the status of the URL for the current tab
+      page_url = tabs[0].url.split('#')[0];
+      oab.debugLog('Sending availability query via chrome tabs for URL ' + page_url);
+      oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
+    });
+  } catch (err) {
+    oab.debugLog('Sending availability query direct from within test page');
+    page_url = window.location.href.split('#')[0];
+    if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('?apikey=')[0].split('&apikey=')[0].split('apikey=')[0];
+    oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
+  }
+}
+
 try {
-  // is it worth checking for an api key here? would we want to test as different users by directly passing api key?
   chrome.storage.local.get({api_key : ''}, function(items) {
     if (items.api_key === '') {
       oab.displayMessage(noapimsg);
       document.getElementById('noapikey').onclick = function () {
         chrome.tabs.create({'url': oab.site_address + oab.register_address});
       };
+      start();
     } else {
       api_key = items.api_key;
       oab.debugLog('api key is available from chrome storage: ' + api_key);
+      start();
     }
   });
 } catch (err) {
@@ -115,20 +132,7 @@ try {
   } else {
     oab.displayMessage('(you are on the test page - you can provide an apikey url param to override this msg).<br>' + noapimsg);
   }
-}
-
-try {
-  chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-    // Start by checking the status of the URL for the current tab
-    page_url = tabs[0].url.split('#')[0];
-    oab.debugLog('Sending availability query via chrome tabs for URL ' + page_url);
-    oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
-  });
-} catch (err) {
-  oab.debugLog('Sending availability query direct from within test page');
-  page_url = window.location.href.split('#')[0];
-  if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('?apikey=')[0].split('&apikey=')[0].split('apikey=')[0];
-  oab.sendAvailabilityQuery(api_key, page_url, handleAvailabilityResponse, oab.handleAPIError);
+  start();
 }
 
 
