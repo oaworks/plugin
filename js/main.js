@@ -106,7 +106,7 @@ var start = function() {
     oab.debugLog('Sending availability query direct from within test page');
     page_url = window.location.href.split('#')[0];
     if (page_url.indexOf('apikey=') !== -1) page_url = page_url.split('?apikey=')[0].split('&apikey=')[0].split('apikey=')[0];
-    oab.sendAvailabilityQuery(api_key, {url:page_url}, handleAvailabilityResponse, oab.handleAPIError);
+    oab.sendAvailabilityQuery(api_key, {url:page_url, dom: document.all[0].outerHTML}, handleAvailabilityResponse, oab.handleAPIError);
   }
 }
 
@@ -147,17 +147,17 @@ var needs = document.getElementsByClassName('need');
 for ( var n in needs ) {
   needs[n].onclick = function(e) {
     var href = e.target.getAttribute('href');
-    if (!href) href = e.target.parentNode.getAttribute('href');
+    if (href === undefined || href === null) href = e.target.parentNode.getAttribute('href');
     var type = e.target.getAttribute('data-type');
-    if (!type) type = e.target.parentNode.getAttribute('data-type');
+    if (type === undefined || type === null) type = e.target.parentNode.getAttribute('data-type');
     var supports = e.target.getAttribute('data-support');
-    if (!supports) type = e.target.parentNode.getAttribute('data-support');
+    if (supports === undefined || supports === null) supports = e.target.parentNode.getAttribute('data-support');
     document.getElementById('story_div').className = 'collapse';
     oab.displayMessage('');
     if ( href === '#' && api_key ) {
       e.preventDefault();
       var action = e.target.getAttribute('data-action');
-      if (!action) action = e.target.parentNode.getAttribute('data-action');
+      if (action === undefined || action === null) action = e.target.parentNode.getAttribute('data-action');
       if (action === 'created' || action === 'supported') {
         var rid = document.getElementById('submit').getAttribute('data-support');
         var u = oab.site_address + '/request/' + rid;
@@ -171,7 +171,8 @@ for ( var n in needs ) {
         }
       } else {
         var ask = action === 'support' ? 'Someone else has started a request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
-        ask += 'How would getting access to this ' + type + ' help you? This message will be sent to the author.';
+        ask += 'How would getting access to this ' + type + ' help you?';
+        if (action !== 'support') ask += 'This message will be sent to the author.';
         document.getElementById('story').setAttribute('placeholder',ask);
         document.getElementById('submit').setAttribute('data-type',type);
         document.getElementById('submit').setAttribute('data-support',supports);
