@@ -24,9 +24,8 @@ var oab = {
     try {
       var manifest = chrome.runtime.getManifest();
       data.plugin = manifest.version_name;
-      if (oab.bookmarklet) data.plugin = 'bookmarklet_' + data.plugin;
     } catch (err) {
-      data.plugin = 'oab_test_page';
+      data.plugin = oab.bookmarklet ? 'bookmarklet_'+oab.bookmarklet : 'oab_test_page';
     }
     if (oab.debug) data.test = true;
     return data;
