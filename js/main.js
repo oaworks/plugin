@@ -159,8 +159,7 @@ for ( var n in needs ) {
       var action = e.target.getAttribute('data-action');
       if (action === undefined || action === null) action = e.target.parentNode.getAttribute('data-action');
       if (action === 'created' || action === 'supported') {
-        var rid = document.getElementById('submit').getAttribute('data-support');
-        var u = oab.site_address + '/request/' + rid;
+        var u = oab.site_address + '/request/' + supports;
         var dm = '<p>You already ' + action + ' a request for this ' + type + '.<br>';
         dm += '<a id="goto_request" href="' + u + '">open the request </a></p>';
         oab.displayMessage(dm);
