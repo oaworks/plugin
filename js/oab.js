@@ -110,6 +110,8 @@ var oab = {
       error_text += oab.site_address + oab.register_address + "</a> and either sign up or sign in - then your plugin will work.";
     } else if (data.status === 403) {
       error_text = 'Something is wrong, please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
+    } else if (data.status === 412) {
+      error_text = data.response.message;
     } else {
       error_text = data.status + '. Hmm, we are not sure what is happening. You or the system may be offline. Please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
     }
