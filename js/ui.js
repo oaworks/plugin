@@ -27,16 +27,15 @@ var oabutton_ui = function(api_key) {
     }
     if (response.data.requests.length > 0) {
       for (var requests_entry of response.data.requests) {
-        if (requests_entry.usupport) {
-          document.getElementById('icon'+requests_entry.type).setAttribute('data-action','supported');
-        } else if (requests_entry.ucreated) {
-          document.getElementById('icon'+requests_entry.type).setAttribute('data-action','created');
+        var rnd = document.getElementById('icon'+requests_entry.type).innerHTML;
+        if (requests_entry.usupport || requests_entry.ucreated) {
+          document.getElementById('icon'+requests_entry.type).setAttribute('href',oab.site_address + '/request/' + requests_entry._id);
+          rnd = rnd.replace('Unavailable','View request');
         } else {
           document.getElementById('icon'+requests_entry.type).setAttribute('data-action','support');
+          document.getElementById('icon'+requests_entry.type).setAttribute('data-support',requests_entry._id);
+          rnd = rnd.replace('Unavailable','Support request');
         }
-        document.getElementById('icon'+requests_entry.type).setAttribute('data-support',requests_entry._id);
-        var rnd = document.getElementById('icon'+requests_entry.type).innerHTML;
-        rnd = rnd.replace('Unavailable','Support request');
         document.getElementById('icon'+requests_entry.type).innerHTML = rnd;
       }
     }
@@ -56,7 +55,8 @@ var oabutton_ui = function(api_key) {
     document.getElementById('icon_submitting').className = 'collapse';
     document.getElementById('story_div').className += ' collapse';
     document.getElementById('story').value = "";
-    var url = oab.site_address + '/request/' + response._id;
+    var url = oab.site_address + '/request/';
+    url += response.rid ? response.rid : response._id
     var msg = "<p>Thank you for ";
     msg += document.getElementById('submit').getAttribute('data-action') === 'create' ? 'creat' : 'support';
     msg += "ing this request!</p>";
@@ -152,37 +152,24 @@ var oabutton_ui = function(api_key) {
       if (type === undefined || type === null) type = e.target.parentNode.getAttribute('data-type');
       var supports = e.target.getAttribute('data-support');
       if (supports === undefined || supports === null) supports = e.target.parentNode.getAttribute('data-support');
-      document.getElementById('story_div').className = 'collapse';
-      oab.displayMessage('');
+      var action = e.target.getAttribute('data-action');
+      if (action === undefined || action === null) action = e.target.parentNode.getAttribute('data-action');
+
       if ( href === '#' && api_key ) {
         e.preventDefault();
-        var action = e.target.getAttribute('data-action');
-        if (action === undefined || action === null) action = e.target.parentNode.getAttribute('data-action');
-        if (action === 'created' || action === 'supported') {
-          var u = oab.site_address + '/request/' + supports;
-          var dm = '<p>You already ' + action + ' a request for this ' + type + '.<br>';
-          dm += '<a id="goto_request" href="' + u + '">open the request </a></p>';
-          oab.displayMessage(dm);
-          if (chrome && chrome.tabs) {
-            document.getElementById('goto_request').onclick = function () {
-              chrome.tabs.create({'url': oab.site_address + '/request/' + supports});
-            };
-          }
+        var ask = action === 'support' ? 'Someone else has started a request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
+        ask += 'How would getting access to this ' + type + ' help you?';
+        if (action !== 'support') ask += 'This message will be sent to the author.';
+        document.getElementById('story').setAttribute('placeholder',ask);
+        document.getElementById('submit').setAttribute('data-type',type);
+        document.getElementById('submit').setAttribute('data-support',supports);
+        document.getElementById('submit').setAttribute('data-action',action);
+        if ( action === 'support' ) {
+          document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('create','support');
         } else {
-          var ask = action === 'support' ? 'Someone else has started a request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
-          ask += 'How would getting access to this ' + type + ' help you?';
-          if (action !== 'support') ask += 'This message will be sent to the author.';
-          document.getElementById('story').setAttribute('placeholder',ask);
-          document.getElementById('submit').setAttribute('data-type',type);
-          document.getElementById('submit').setAttribute('data-support',supports);
-          document.getElementById('submit').setAttribute('data-action',action);
-          if ( action === 'support' ) {
-            document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('create','support');
-          } else {
-            document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('support','create');
-          }
-          document.getElementById('story_div').className = '';
+          document.getElementById('submit').innerHTML = document.getElementById('submit').innerHTML.replace('support','create');
         }
+        document.getElementById('story_div').className = '';
       } else if (chrome && chrome.tabs && api_key) {
         chrome.tabs.create({'url': href});
       } else {
