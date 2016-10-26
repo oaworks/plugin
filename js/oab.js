@@ -116,7 +116,9 @@ var oab = {
       error_text = data.status + '. Hmm, we are not sure what is happening. You or the system may be offline. Please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
     }
     if (error_text !== '') {
-      error_text = '<p><img src="../img/error.png" style="margin:5px auto 10px 100px;"></p>' + error_text;
+      error_text = '<p><img src="';
+      error_text += oab.bookmarklet ? oab.site_address + '/static/bookmarklet/img/error.png' : '../img/error.png';
+      error_text += '" style="margin:5px auto 10px 100px;"></p>' + error_text;
       document.getElementById('loading_area').className = 'row collapse';
       oab.displayMessage(error_text, undefined, 'error');
       if (chrome && chrome.tabs) {

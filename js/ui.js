@@ -172,8 +172,6 @@ var oabutton_ui = function(api_key) {
         document.getElementById('story_div').className = '';
       } else if (chrome && chrome.tabs && api_key) {
         chrome.tabs.create({'url': href});
-      } else {
-        e.preventDefault();
       }
     }
   }
