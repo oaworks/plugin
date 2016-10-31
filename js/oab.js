@@ -2,13 +2,13 @@
 
 var oab = {
 
-  debug : false, // this puts the button in debug mode, issues debug warnings
+  debug : true, // this puts the button in debug mode, issues debug warnings
 
   bookmarklet : false, // this lib is also used by a bookmarklet, which sets this to change plugin type
   
-  api_address : /*'https://dev.api.cottagelabs.com/service/oab', //*/ 'https://api.openaccessbutton.org',
+  api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
 
-  site_address : /*'http://oab.test.cottagelabs.com', //*/ 'https://openaccessbutton.org',
+  site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
 
   howto_address : '/instructions',
 
