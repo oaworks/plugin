@@ -54,6 +54,7 @@ However, we commonly use releases on this repository. It may be better to use a 
 
 ## Managing releases 
 
-* Only releases tagged "Release" can be put in the Chrome Store. Anything tagged "pre-release" will only work in development. 
+* Only releases tagged "Release" can be put in the Chrome Store. Anything tagged "pre-release" will only work in development. Any time we want to release something new out to chrome, it will always be the latest live release that can be pushed to the chrome store. 
 * Releases can be made through the Chrome store here: https://chrome.google.com/webstore/category/extensions while logged into the leads Open Access Button Account. 
 * Releases should be tested on master, just in case, after release. 
+* Releases tagged pre-release will increment whenever we push new features/fixes etc, and the most recent pre-release should be used for testing, then once testing is confirmed, we will make a live release.
