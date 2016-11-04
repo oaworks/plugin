@@ -22,6 +22,7 @@ Quick guide:
 ## packaging for Firefox
 
 Firefox requires extra keys in the manifest, and the project files zip archived with extension ```.xpi```. The script ```pack_ffx.py``` does this. Supply the required [extension ID](https://developer.mozilla.org/en-US/Add-ons/Install_Manifests#id).
+
 ```./pack_ffx.py -i oab-ffx@openaccessbutton.org```
 
 ## Install from development
@@ -50,3 +51,9 @@ However, we commonly use releases on this repository. It may be better to use a 
 * Click the newly appeared 'Load unpacked extension...' button
 * Browse to the project directory you just downloaded, click 'Select'. It will upload the zip file you just downloaded.
 * If you're experiencing problems with any of these steps, feel free to leave an issue on the backend repository [here](https://github.com/OAButton/backend/issues/new).
+
+## Managing releases 
+
+* Only releases tagged "Release" can be put in the Chrome Store. Anything tagged "pre-release" will only work in development. 
+* Releases can be made through the Chrome store here: https://chrome.google.com/webstore/category/extensions while logged into the leads Open Access Button Account. 
+* Releases should be tested on master, just in case, after release. 
