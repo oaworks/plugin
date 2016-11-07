@@ -20,8 +20,8 @@ parser.add_argument("-d",
                          "Defaults to .. so this script can used in a submodule")
 parser.add_argument("-i",
                     "--id",
-                    default="firefox_extension@cottagelabs.com",
-                    help="extension ID to be added to the manifest. Default is firefox_extension@cottagelabs.com")
+                    default="oab-ffx@openaccessbutton.org",
+                    help="extension ID to be added to the manifest. Default is oab-ffx@openaccessbutton.org")
 parser.add_argument("-m",
                     "--min_version",
                     default="45.0",
@@ -76,11 +76,11 @@ with zipfile.ZipFile(file=archive_filename, mode='w') as xpi_zip:
     for root, dirs, files in os.walk(args.dir):
         # exclude hidden files and directories
         files = [f for f in files if not f.startswith('.')]
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        dirs[:] = [d for d in dirs if not d.startswith('.') and not d == 'firefox']
 
         for fi in files:
             # add all files to archive except any old .xpi, the old manifest and this script
-            if fi != 'manifest.json' and fi != 'pack_ffx.py' and not fi.endswith(".xpi"):
+            if fi != 'manifest.json' and fi != 'pack.py' and not fi.endswith(".xpi"):
                 xpi_zip.write(filename=os.path.join(root, fi),
                               arcname=match_root.sub('', os.path.join(root, fi)),
                               compress_type=zipfile.ZIP_DEFLATED)

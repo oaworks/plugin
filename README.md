@@ -21,8 +21,10 @@ Quick guide:
 
 ## packaging for Firefox
 
-Firefox requires extra keys in the manifest, and the project files zip archived with extension ```.xpi```. The script ```pack_ffx.py``` does this. Supply the required [extension ID](https://developer.mozilla.org/en-US/Add-ons/Install_Manifests#id).
-```./pack_ffx.py -i oab-ffx@openaccessbutton.org```
+Firefox requires extra keys in the manifest, and the project files zip archived with extension ```.xpi```. The script ```firefox/pack.py``` does this. Pull the code repo locally and enter the .firefox folder, then just run ```python pack.py``` to generate a firefox .xpi archive that you can then use as an addon in firefox.
+
+You can install this manually for testing by opening firefox and going to Tools > Add-ons then in the Add-ons Manager page that opens, click the arrow next to the 
+cog near the top right and select "Install Add-on From File" 
 
 ## Install from development
 
