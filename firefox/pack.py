@@ -20,8 +20,8 @@ parser.add_argument("-d",
                          "Defaults to .. so this script can used in a submodule")
 parser.add_argument("-i",
                     "--id",
-                    default="oab-ffx@openaccessbutton.org",
-                    help="extension ID to be added to the manifest. Default is oab-ffx@openaccessbutton.org")
+                    default="jid1-I4HAe95cHq6CJQ@jetpack",
+                    help="extension ID to be added to the manifest. Default is jid1-I4HAe95cHq6CJQ@jetpack")
 parser.add_argument("-m",
                     "--min_version",
                     default="45.0",
