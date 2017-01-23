@@ -159,7 +159,7 @@ var oabutton_ui = function(api_key) {
         e.preventDefault();
         var ask = action === 'support' ? 'Someone else has started a request for this ' + type + '. Add your support. ' : 'Create a new ' + type + ' request. ';
         ask += 'How would getting access to this ' + type + ' help you?';
-        if (action !== 'support') ask += 'This message will be sent to the author.';
+        if (action !== 'support') ask += ' This message will be sent to the author.';
         document.getElementById('story').setAttribute('placeholder',ask);
         document.getElementById('submit').setAttribute('data-type',type);
         document.getElementById('submit').setAttribute('data-support',supports);
