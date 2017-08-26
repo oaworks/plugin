@@ -5,12 +5,12 @@
   "manifest_version": 2,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": {
-    "128": "img/icon_OAB.png"
+    "128": "img/oa128.png"
   },
   "background": { "scripts": ["js/background.js"] },
   "browser_action": {
     "default_title": "Open Access Button",
-    "default_icon": "img/icon_OAB.png",
+    "default_icon": "img/oa128.png",
     "default_popup": "html/main.html"
   },
   "permissions": [
