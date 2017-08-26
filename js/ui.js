@@ -12,6 +12,7 @@ var oabutton_ui = function() {
         document.getElementById('oabutton_popup').style.backgroundColor = '#5cb85c';
         document.getElementById('iconarticle').setAttribute('href',avail_entry.url);
         document.getElementById('iconarticle').innerHTML = 'Available!';
+        document.getElementById('iconarticle').click();
         if (chrome && chrome.tabs) chrome.tabs.create({'url': avail_entry.url});
       }
     }
@@ -20,6 +21,7 @@ var oabutton_ui = function() {
         document.getElementById('oabutton_popup').style.backgroundColor = 'orange';
         document.getElementById('iconarticle').setAttribute('href',oab.site_address + '/request/' + requests_entry._id);
         document.getElementById('iconarticle').innerHTML = 'Request in progress!';
+        document.getElementById('iconarticle').click();
         if (chrome && chrome.tabs) chrome.tabs.create({'url': oab.site_address + '/request/' + requests_entry._id});
       }
     }
@@ -28,6 +30,7 @@ var oabutton_ui = function() {
         document.getElementById('oabutton_popup').style.backgroundColor = '#d9534f';
         document.getElementById('iconarticle').setAttribute('href',oab.site_address + '/request?url=' + encodeURIComponent(window.location.href));
         document.getElementById('iconarticle').innerHTML = 'Unavailable - request it!';
+        document.getElementById('iconarticle').click();
         if (chrome && chrome.tabs) {
           chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
             chrome.tabs.create({'url': oab.site_address + '/request?url=' + encodeURIComponent(tabs[0].url)});
