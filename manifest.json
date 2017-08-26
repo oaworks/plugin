@@ -2,7 +2,7 @@
   "name": "Open Access Button",
   "version": "1.1.0",
   "version_name": "oabutton_1.1.0",
-  "manifest_version": 1,
+  "manifest_version": 2,
   "description": "Push Button. Get Research. Make Progress.",
   "browser_action": {
     "default_title": "Open Access Button",
