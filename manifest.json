@@ -1,26 +1,16 @@
 {
   "name": "Open Access Button",
-  "version": "1.0.3",
-  "version_name": "oabutton_1.0.3",
-  "manifest_version": 2,
+  "version": "1.1.0",
+  "version_name": "oabutton_1.1.0",
+  "manifest_version": 1,
   "description": "Push Button. Get Research. Make Progress.",
-  "icons": {
-    "128": "img/oa128.png"
-  },
   "browser_action": {
     "default_title": "Open Access Button",
     "default_icon": "img/oa128.png",
     "default_popup": "html/main.html"
   },
-  "content_scripts": [
-    {
-      "matches": ["*://openaccessbutton.org/account","*://oab.test.cottagelabs.com/account"],
-      "js": ["js/account.js"]
-    }
-  ],
   "permissions": [
     "activeTab",
-    "storage",
-    "geolocation"
+    "storage"
   ]
 }

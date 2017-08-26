@@ -21,50 +21,12 @@
       margin-right: auto;
       margin-left: auto;
     }
-    .btn-group {
-      width: 100% !important;
-    }
-    .need {
-      display:inline-block;
-      float:left;
-      margin-top:3px;
-      margin-left:11px;
-      background-color:#f04717;
-      height:165px;
-      width:160px;
-      text-align:center;
-      color:#333;
-    }
-    .need:hover {
-      background-color:#d4461e;
-    }
   </style>
 </head>
 <body>
   <div class="container popup_main">
-    <h2 style="background-color:white;margin:0 -10px 0px -10px;padding:20px 0px 20px 5px;"><img src="../img/oa128.png" style="width:40px;"> Open Access Button</h2>
-    <div class="row" id="loading_area" style="margin:5px -10px 10px -10px;">
-      <div class="col-md-12">
-        <img id="icon_loading" style="width:150px;margin:20px auto 10px 80px;" src="../img/spin_orange.svg">
-        <p style="text-align:center;">We're looking!<br> Give us a moment.</p>
-      </div>
-    </div>
-    <div class="row collapse" id="buttonstatus" style="margin:5px -10px 10px -10px;">
-      <a href="#" id="iconarticle" class="well need" data-type="article" alt="Sorry, we couldn't find it. Click to start a new request" title="Sorry, we couldn't find it. Click to start a new request">
-        <img style="height:100px;width:80px;margin-bottom:12px;" src="../img/oab_article.png"><br>
-        Unavailable
-      </a>
-      <a href="#" id="icondata" class="well need" data-type="data" alt="Sorry, we couldn't find it. Click to start a new request" title="Sorry, we couldn't find it. Click to start a new request">
-        <img style="height:110px;width:80px;margin-top:2px;" src="../img/oab_data.png"><br>
-        Unavailable
-      </a>
-    </div>
-    <div id="message" style="margin-top:5px;"></div>
-    <div class="collapse" id="story_div">
-      <textarea class="form-control" rows="4" id="story" placeholder="How would getting access to this research help you? This message will be sent to the author."></textarea>
-      <img id="icon_submitting" style="width:30px;margin:0px auto 0px 10px;" src="../img/spin_orange.svg" class="collapse">
-      <button type="submit" class="btn btn-default btn-lg btn-block" id="submit" style="margin-top:5px;background-color:#f04717;" disabled>Say why you need this in up to <br><span id="counter">25</span> words to create this request</button>
-    </div>
+    <img id="iconloading" style="width:40px;height:40px;" src="../img/spin_orange.svg">
+    <a href="#" id="iconarticle"></a>
   </div>
 
   <script type="text/javascript" src="../js/oab.js"></script>
