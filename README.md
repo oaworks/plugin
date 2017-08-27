@@ -21,8 +21,18 @@ Quick guide:
 
 ## packaging for Firefox
 
-Firefox requires extra keys in the manifest, and the project files zip archived with extension ```.xpi```. The script ```pack_ffx.py``` does this. Supply the required [extension ID](https://developer.mozilla.org/en-US/Add-ons/Install_Manifests#id).
-```./pack_ffx.py -i oab-ffx@openaccessbutton.org```
+Firefox requires extra keys in the manifest, and the project files zip archived with extension ```.xpi```. The script ```firefox/pack.py``` does this. Pull the code repo locally and enter the .firefox folder, then just run ```python pack.py``` to generate a firefox .xpi archive that you can then use as an addon in firefox.
+
+You can install this manually for testing - annoyingly, firefox no longer supports the config setting to install unsigned add-ons in newer versions, 
+even though you can still see it there in the config. So you HAVE TO install Firefox Developer Edition to test it. You may then still have to change 
+the setting to allow unsigned add-ons too, I got sick of it at this point and stopped trying (also in old versions of firefox this may still be the case).
+
+To enable installing unsigned add-ons go to about:config in the firefox URL bar and search for the setting xpinstall.signatures.required and click to change 
+it to false.
+
+Once you have firefox dev edition (or an old version respecting the config setting), open firefox and go to Tools > Add-ons then in the Add-ons Manager 
+page that opens, click the arrow next to the cog near the top right and select "Install Add-on From File" then browse to the repo code and in the firefox 
+folder select the .xpi file.
 
 ## Install from development
 
