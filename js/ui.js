@@ -1,10 +1,43 @@
 
+
 var oabutton_ui = function() {
   // =============================================
   // declare vars and functions
 
+  var debug = true;
+  var bookmarklet = false; // this script is also used by a bookmarklet, which sets this to a version to change plugin type
+  
+  var api_address = debug ? 'https://dev.api.cottagelabs.com/service/oab' : 'https://api.openaccessbutton.org';
+  var site_address = debug ? 'https://dev.openaccessbutton.org' :'https://openaccessbutton.org';
+
+  function availability(data, success_callback) {
+    try {
+      var manifest = chrome.runtime.getManifest();
+      data.plugin = manifest.version_name;
+    } catch (err) {
+      data.plugin = bookmarklet ? 'bookmarklet_'+bookmarklet : 'oab_test_page';
+    }
+    if (debug) data.test = true;
+    var http = new XMLHttpRequest();
+    var url = api_address + '/availability';
+    http.open("POST", url, true);
+    http.setRequestHeader("Content-type", "application/json; charset=utf-8");
+    http.onreadystatechange = function() {
+      if (http.readyState == XMLHttpRequest.DONE) {
+        http.status === 200 ? success_callback(JSON.parse(http.response)) : error(http);
+      }
+    }
+    http.send(JSON.stringify(data));
+  }
+
+  function error(data) {
+    var code = data.response && data.response.code ? data.response.code : data.status;
+    document.getElementById('iconarticle').innerHTML('<a href="' + oab.site_address + '/feedback?code=' + code + '">Error! Click to report.</a>');
+    if (chrome && chrome.tabs) chrome.tabs.create({'url': site_address + '/feedback?code=' + code});
+  }
+
   function display(response) {
-    if (oab.debug) console.log('API response: ' + JSON.stringify(response.data));
+    if (debug) console.log('API response: ' + JSON.stringify(response.data));
     document.getElementById('iconloading').style.display = 'none';
     document.getElementById('iconarticle').style.display = 'inline';
     for ( var avail_entry of response.data.availability ) {
@@ -19,21 +52,21 @@ var oabutton_ui = function() {
     for (var requests_entry of response.data.requests) {
       if (requests_entry.type === 'article') {
         document.getElementById('oabutton_popup').style.backgroundColor = 'orange';
-        document.getElementById('iconarticle').setAttribute('href',oab.site_address + '/request/' + requests_entry._id);
+        document.getElementById('iconarticle').setAttribute('href',site_address + '/request/' + requests_entry._id);
         document.getElementById('iconarticle').innerHTML = 'Request in progress!';
         document.getElementById('iconarticle').click();
-        if (chrome && chrome.tabs) chrome.tabs.create({'url': oab.site_address + '/request/' + requests_entry._id});
+        if (chrome && chrome.tabs) chrome.tabs.create({'url': site_address + '/request/' + requests_entry._id});
       }
     }
     for (var accepts_entry of response.data.accepts) {
       if (accepts_entry.type === 'article') {
         document.getElementById('oabutton_popup').style.backgroundColor = '#d9534f';
-        document.getElementById('iconarticle').setAttribute('href',oab.site_address + '/request?url=' + encodeURIComponent(window.location.href));
+        document.getElementById('iconarticle').setAttribute('href',site_address + '/request?url=' + encodeURIComponent(window.location.href));
         document.getElementById('iconarticle').innerHTML = 'Unavailable - request it!';
         document.getElementById('iconarticle').click();
         if (chrome && chrome.tabs) {
           chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-            chrome.tabs.create({'url': oab.site_address + '/request?url=' + encodeURIComponent(tabs[0].url)});
+            chrome.tabs.create({'url': site_address + '/request?url=' + encodeURIComponent(tabs[0].url)});
           });
         }
       }
@@ -41,7 +74,7 @@ var oabutton_ui = function() {
   }
 
   try {
-    chrome.runtime.setUninstallURL(oab.site_address + '/feedback#uninstall');
+    chrome.runtime.setUninstallURL(site_address + '/feedback#uninstall');
     chrome.tabs.executeScript({
       code: 'chrome.storage.local.set({dom: document.all[0].outerHTML });'
     });
@@ -52,15 +85,15 @@ var oabutton_ui = function() {
       try {
         chrome.storage.local.get({dom : ''}, function(items) {
           if (items.dom !== '') qry.dom = items.dom;
-          oab.availability(qry, display);
+          availability(qry, display);
         });
       } catch (err) {
-        oab.availability(qry, display);
+        availability(qry, display);
       }
     });
   } catch (err) {
     if (oab.debug) console.log('Sending availability query direct from within page');
-    oab.availability({url:window.location.href.split('#')[0], dom: document.all[0].outerHTML}, display);
+    availability({url:window.location.href.split('#')[0], dom: document.all[0].outerHTML}, display);
   }
   
 };
