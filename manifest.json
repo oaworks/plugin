@@ -5,7 +5,7 @@
   "version_name": "oabutton_4.1.1",
   "manifest_version": 2,
   "description": "Push Button. Get Research. Make Progress.",
-  "background" : { "scripts" : ["background.js"] },
+  "background" : { "scripts" : ["js/background.js"] },
   "browser_action": {
     "default_title": "Open Access Button",
     "default_icon": "img/oa128.png",
