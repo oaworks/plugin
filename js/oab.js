@@ -134,7 +134,7 @@ try {
   if (chrome && chrome.browserAction) {
     function execute() {
       chrome.browserAction.setIcon({path:"../img/static_spin_orange_32.png"});
-      oabutton_rotae_next = 1;
+      oabutton_rotate_next = 1;
       oabutton_rotate();
       oabutton_ui();
     }
