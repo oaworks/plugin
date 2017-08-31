@@ -78,6 +78,11 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
         }
       }
     }
+    try {
+      if (chrome && chrome.browserAction) {
+        chrome.browserAction.setIcon({path:"../img/oa128.png"});
+      }
+    } catch(err) {}
   }
 
   try {
@@ -106,7 +111,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
 };
 
 function updateIcon() {
-  chrome.browserAction.setIcon({path:"../img/spin_orange_32.png"});
+  chrome.browserAction.setIcon({path:"../img/spin_orange_32.svg"});
   oabutton_ui();
 }
 chrome.browserAction.onClicked.addListener(updateIcon);
