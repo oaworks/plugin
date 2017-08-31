@@ -50,23 +50,24 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   function error(data) {
     var code = data.response && data.response.code ? data.response.code : data.status;
     var redir = code === 400 ? site_address + '/instructions#blacklist' : '/feedback?code=' + code;
-    if (bookmarklet) document.getElementById('iconarticle').innerHTML('<a href="' + redir + '">Error! Click to report.</a>');
+    if (bookmarklet) {
+      document.getElementById('iconloading').style.display = 'none';
+      document.getElementById('iserror').style.display = 'inline';
+      document.getElementById('linkerror').setAttribute('href',redir);
+      document.getElementById('linkerror').click();
+    }
     if (chrome && chrome.tabs) chrome.tabs.create({'url': redir});
   }
 
   function display(response) {
     if (debug) console.log('API response: ' + JSON.stringify(response.data));
-    if (bookmarklet) {
-      document.getElementById('iconloading').style.display = 'none';
-      document.getElementById('iconarticle').style.display = 'inline';
-    }
+    if (bookmarklet) document.getElementById('iconloading').style.display = 'none';
     for ( var avail_entry of response.data.availability ) {
       if (avail_entry.type === 'article') {
         if (bookmarklet) {
-          document.getElementById('oabutton_popup').style.backgroundColor = '#5cb85c';
-          document.getElementById('iconarticle').setAttribute('href',avail_entry.url);
-          document.getElementById('iconarticle').innerHTML = 'Available!';
-          document.getElementById('iconarticle').click();
+          document.getElementById('isopen').style.display = 'inline';
+          document.getElementById('linkopen').setAttribute('href',avail_entry.url);
+          document.getElementById('linkopen').click();
         }
         if (chrome && chrome.tabs) chrome.tabs.create({'url': avail_entry.url});
       }
@@ -74,10 +75,9 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
     for (var requests_entry of response.data.requests) {
       if (requests_entry.type === 'article') {
         if (bookmarklet) {
-          document.getElementById('oabutton_popup').style.backgroundColor = 'orange';
-          document.getElementById('iconarticle').setAttribute('href',site_address + '/request/' + requests_entry._id);
-          document.getElementById('iconarticle').innerHTML = 'Request in progress!';
-          document.getElementById('iconarticle').click();
+          document.getElementById('isclosed').style.display = 'inline';
+          document.getElementById('linkclosed').setAttribute('href',site_address + '/request/' + requests_entry._id);
+          document.getElementById('linkclosed').click();
         }
         if (chrome && chrome.tabs) chrome.tabs.create({'url': site_address + '/request/' + requests_entry._id});
       }
@@ -85,10 +85,9 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
     for (var accepts_entry of response.data.accepts) {
       if (accepts_entry.type === 'article') {
         if (bookmarklet) {
-          document.getElementById('oabutton_popup').style.backgroundColor = '#d9534f';
-          document.getElementById('iconarticle').setAttribute('href',site_address + '/request?url=' + encodeURIComponent(window.location.href));
-          document.getElementById('iconarticle').innerHTML = 'Unavailable - request it!';
-          document.getElementById('iconarticle').click();
+          document.getElementById('isclosed').style.display = 'inline';
+          document.getElementById('linkclosed').setAttribute('href',site_address + '/request?url=' + encodeURIComponent(window.location.href));
+          document.getElementById('linkclosed').click();
         }
         if (chrome && chrome.tabs) {
           chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
