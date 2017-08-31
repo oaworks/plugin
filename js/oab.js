@@ -2,7 +2,7 @@
 var oabutton_rotate_next = false;
 
 function oabutton_rotate() {
-  var path = 'spin_orange_32';
+  var path = '../img/static_spin_orange_32';
   if (oabutton_rotate_next === 1) {
     path += '_r1';
     oabutton_rotate_next = 2;
@@ -12,7 +12,6 @@ function oabutton_rotate() {
   } else if (oabutton_rotate_next === 0) {
     oabutton_rotate_next = 1;
   }
-  path += '';
   path += '.png';
   chrome.browserAction.setIcon({ path: path });
   if (oabutton_rotate_next !== false) setTimeout(oabutton_rotate, 100);
