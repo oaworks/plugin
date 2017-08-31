@@ -14,7 +14,7 @@ function oabutton_rotate() {
   }
   path += '.png';
   chrome.browserAction.setIcon({ path: path });
-  if (oabutton_rotate_next !== false) setTimeout(oabutton_rotate, 100);
+  if (oabutton_rotate_next !== false) setTimeout(oabutton_rotate, 300);
 }
 
 var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
