@@ -1,9 +1,9 @@
 {
   "name": "Open Access Button",
   "short_name": "OAbutton",
-  "version": "4.1.1",
-  "version_name": "oabutton_4.1.1",
-  "manifest_version": 2,
+  "version": "4.1.2",
+  "version_name": "oabutton_4.1.2",
+  "manifest_version": 3,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": {
     "128": "img/oa128.png"
