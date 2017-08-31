@@ -106,7 +106,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
 };
 
 function updateIcon() {
-  chrome.browserAction.setIcon({path:"../img/spin_orange.svg"});
+  chrome.browserAction.setIcon({path:"../img/spin_orange.png"});
   oabutton_ui();
 }
 chrome.browserAction.onClicked.addListener(updateIcon);
