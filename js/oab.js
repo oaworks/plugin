@@ -27,7 +27,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   if (api_address === undefined) api_address = debug ? 'https://dev.api.cottagelabs.com/service/oab' : 'https://api.openaccessbutton.org';
   if (site_address === undefined)  site_address = debug ? 'https://dev.openaccessbutton.org' :'https://openaccessbutton.org';
 
-  function availability(data, success_callback) {
+  function availability(data) {
     try {
       var manifest = chrome.runtime.getManifest();
       data.plugin = manifest.version_name;
@@ -41,7 +41,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
     http.setRequestHeader("Content-type", "application/json; charset=utf-8");
     http.onreadystatechange = function() {
       if (http.readyState == XMLHttpRequest.DONE) {
-        http.status === 200 ? success_callback(JSON.parse(http.response)) : error(http);
+        http.status === 200 ? display(JSON.parse(http.response)) : error(http);
       }
     }
     http.send(JSON.stringify(data));
@@ -49,8 +49,9 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
 
   function error(data) {
     var code = data.response && data.response.code ? data.response.code : data.status;
-    if (bookmarklet) document.getElementById('iconarticle').innerHTML('<a href="' + oab.site_address + '/feedback?code=' + code + '">Error! Click to report.</a>');
-    if (chrome && chrome.tabs) chrome.tabs.create({'url': site_address + '/feedback?code=' + code});
+    var redir = code === 400 ? site_address + '/instructions#blacklist' : '/feedback?code=' + code;
+    if (bookmarklet) document.getElementById('iconarticle').innerHTML('<a href="' + redir + '">Error! Click to report.</a>');
+    if (chrome && chrome.tabs) chrome.tabs.create({'url': redir});
   }
 
   function display(response) {
@@ -107,26 +108,28 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   }
 
   try {
-    chrome.runtime.setUninstallURL(site_address + '/feedback#uninstall');
-    chrome.tabs.executeScript({
-      code: 'chrome.storage.local.set({dom: document.all[0].outerHTML });'
-    });
-  } catch(err) {}
-  try {
-    chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-      var qry = {url:tabs[0].url.split('#')[0]};
-      try {
-        chrome.storage.local.get({dom : ''}, function(items) {
-          if (items.dom !== '') qry.dom = items.dom;
-          availability(qry, display);
+    chrome.storage.local.remove(['dom'],function() {
+      chrome.tabs.executeScript({
+        code: 'chrome.storage.local.set({dom: document.all[0].outerHTML });'
+      },function() {
+        chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+          var qry = {url:tabs[0].url.split('#')[0]};
+          try {
+            chrome.storage.local.get({dom : ''}, function(items) {
+              if (items.dom !== '') qry.dom = items.dom;
+              availability(qry);
+            });
+          } catch (err) {
+            availability(qry);
+          }
         });
-      } catch (err) {
-        availability(qry, display);
-      }
+      });
     });
   } catch (err) {
-    if (oab.debug) console.log('Sending availability query direct from within page');
-    if (bookmarklet) availability({url:window.location.href.split('#')[0], dom: document.all[0].outerHTML}, display);
+    if (bookmarklet) {
+      if (debug) console.log('Sending availability query direct from within page');
+      availability({url:window.location.href.split('#')[0], dom: document.all[0].outerHTML});
+    }
   }
 };
 
@@ -140,4 +143,8 @@ try {
     }
     chrome.browserAction.onClicked.addListener(execute);
   }
+} catch(err) {}
+
+try {
+  chrome.runtime.setUninstallURL(site_address + '/feedback#uninstall');
 } catch(err) {}
