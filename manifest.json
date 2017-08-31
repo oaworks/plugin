@@ -3,7 +3,7 @@
   "short_name": "OAbutton",
   "version": "4.1.2",
   "version_name": "oabutton_4.1.2",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": {
     "128": "img/oa128.png"
