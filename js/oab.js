@@ -1,4 +1,23 @@
 
+var oabutton_rotate_next = false;
+
+function oabutton_rotate() {
+  var path = 'spin_orange_32';
+  if (oabutton_rotate_next === 1) {
+    path += '_r1';
+    oabutton_rotate_next = 2;
+  } else if (oabutton_rotate_next === 2) {
+    path += '_r2';
+    oabutton_rotate_next = 0;
+  } else if (oabutton_rotate_next === 0) {
+    oabutton_rotate_next = 1;
+  }
+  path += '';
+  path += '.png';
+  chrome.browserAction.setIcon({ path: path });
+  if (oabutton_rotate_next !== false) setTimeout(oabutton_rotate, 100);
+}
+
 var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   // =============================================
   // declare vars and functions
@@ -80,6 +99,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
     }
     try {
       if (chrome && chrome.browserAction) {
+        oabutton_rotate_next = false;
         setTimeout(function() {
           chrome.browserAction.setIcon({path:"../img/oa128.png"});
         },1000);
@@ -115,6 +135,8 @@ try {
   if (chrome && chrome.browserAction) {
     function execute() {
       chrome.browserAction.setIcon({path:"../img/static_spin_orange_32.png"});
+      oabutton_rotae_next = 1;
+      oabutton_rotate();
       oabutton_ui();
     }
     chrome.browserAction.onClicked.addListener(execute);
