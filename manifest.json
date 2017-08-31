@@ -8,7 +8,7 @@
   "icons": {
     "128": "img/oa128.png"
   },
-  "background" : { "scripts" : ["js/background.js"] },
+  "background" : { "scripts" : ["js/oab.js"] },
   "browser_action": {
     "default_title": "Open Access Button",
     "default_icon": "img/oa128.png"

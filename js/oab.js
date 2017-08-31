@@ -1,5 +1,4 @@
 
-
 var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   // =============================================
   // declare vars and functions
@@ -79,6 +78,13 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
         }
       }
     }
+    try {
+      if (chrome && chrome.browserAction) {
+        setTimeout(function() {
+          chrome.browserAction.setIcon({path:"../img/oa128.png"});
+        },1000);
+      }
+    } catch(err) {}
   }
 
   try {
@@ -103,5 +109,14 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
     if (oab.debug) console.log('Sending availability query direct from within page');
     if (bookmarklet) availability({url:window.location.href.split('#')[0], dom: document.all[0].outerHTML}, display);
   }
-  
 };
+
+try {
+  if (chrome && chrome.browserAction) {
+    function execute() {
+      chrome.browserAction.setIcon({path:"../img/static_spin_orange_32.png"});
+      oabutton_ui();
+    }
+    chrome.browserAction.onClicked.addListener(execute);
+  }
+} catch(err) {}
