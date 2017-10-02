@@ -154,3 +154,10 @@ try {
 try {
   chrome.runtime.setUninstallURL(site_address + '/feedback#uninstall');
 } catch(err) {}
+
+try {
+  function instruct() {
+    chrome.tabs.create({'url': site_address + '/instructions'});
+  }
+  chrome.runtime.onInstalled.addListener(instruct);
+} catch(err) {}
