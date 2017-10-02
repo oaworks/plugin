@@ -60,6 +60,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
 
   function error(data) {
     var code = data.response && data.response.code ? data.response.code : data.status;
+    if (debug) console.log(data);
     var redir = code === 400 ? oabutton_site_address + '/instructions#blacklist' : oabutton_site_address + '/feedback?code=' + code;
     if (bookmarklet) {
       document.getElementById('iconloading').style.display = 'none';
