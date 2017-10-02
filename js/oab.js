@@ -1,4 +1,5 @@
 
+var oabutton_running = false;
 var oabutton_rotate_next = false;
 
 function oabutton_rotate() {
@@ -18,8 +19,13 @@ function oabutton_rotate() {
 }
 
 var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
+  // don't do anything if already running, probably a user pressed the button twice in quick succession
+  if (oabutton_running) return;
+  oabutton_running = true;
+
   // =============================================
   // declare vars and functions
+  
 
   if (debug === undefined) debug = true;
   if (bookmarklet === undefined) bookmarklet = false; // this script is also used by a bookmarklet, which sets this to a version to change plugin type
@@ -41,6 +47,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
     http.setRequestHeader("Content-type", "application/json; charset=utf-8");
     http.onreadystatechange = function() {
       if (http.readyState == XMLHttpRequest.DONE) {
+        oabutton_running = false;
         http.status === 200 ? display(JSON.parse(http.response)) : error(http);
       }
     }
