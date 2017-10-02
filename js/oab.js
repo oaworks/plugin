@@ -2,6 +2,8 @@
 var oabutton_running = false;
 var oabutton_rotate_next = false;
 
+var oabutton_site_address = 'https://openaccessbutton.org';
+
 function oabutton_rotate() {
   var path = '../img/static_spin_orange_32';
   if (oabutton_rotate_next === 1) {
@@ -26,12 +28,14 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   // =============================================
   // declare vars and functions
   
-
   if (debug === undefined) debug = true;
   if (bookmarklet === undefined) bookmarklet = false; // this script is also used by a bookmarklet, which sets this to a version to change plugin type
-  
-  if (api_address === undefined) api_address = debug ? 'https://dev.api.cottagelabs.com/service/oab' : 'https://api.openaccessbutton.org';
-  if (site_address === undefined)  site_address = debug ? 'https://dev.openaccessbutton.org' :'https://openaccessbutton.org';
+  if (debug) {
+    if (api_address === undefined) api_address = 'https://dev.api.cottagelabs.com/service/oab';
+    oabutton_site_address = 'https://dev.openaccessbutton.org';
+  }
+  if (api_address === undefined) api_address = 'https://api.openaccessbutton.org';
+  if (site_address !== undefined)  oabutton_site_address = site_address;
 
   function availability(data) {
     try {
@@ -56,7 +60,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
 
   function error(data) {
     var code = data.response && data.response.code ? data.response.code : data.status;
-    var redir = code === 400 ? site_address + '/instructions#blacklist' : '/feedback?code=' + code;
+    var redir = code === 400 ? oabutton_site_address + '/instructions#blacklist' : oabutton_site_address + '/feedback?code=' + code;
     if (bookmarklet) {
       document.getElementById('iconloading').style.display = 'none';
       document.getElementById('iserror').style.display = 'inline';
@@ -83,22 +87,22 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
       if (requests_entry.type === 'article') {
         if (bookmarklet) {
           document.getElementById('isclosed').style.display = 'inline';
-          document.getElementById('linkclosed').setAttribute('href',site_address + '/request/' + requests_entry._id);
+          document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request/' + requests_entry._id);
           document.getElementById('linkclosed').click();
         }
-        if (chrome && chrome.tabs) chrome.tabs.create({'url': site_address + '/request/' + requests_entry._id});
+        if (chrome && chrome.tabs) chrome.tabs.create({'url': oabutton_site_address + '/request/' + requests_entry._id});
       }
     }
     for (var accepts_entry of response.data.accepts) {
       if (accepts_entry.type === 'article') {
         if (bookmarklet) {
           document.getElementById('isclosed').style.display = 'inline';
-          document.getElementById('linkclosed').setAttribute('href',site_address + '/request?url=' + encodeURIComponent(window.location.href));
+          document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request?url=' + encodeURIComponent(window.location.href));
           document.getElementById('linkclosed').click();
         }
         if (chrome && chrome.tabs) {
           chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-            chrome.tabs.create({'url': site_address + '/request?url=' + encodeURIComponent(tabs[0].url)});
+            chrome.tabs.create({'url': oabutton_site_address + '/request?url=' + encodeURIComponent(tabs[0].url)});
           });
         }
       }
@@ -152,12 +156,12 @@ try {
 } catch(err) {}
 
 try {
-  chrome.runtime.setUninstallURL(site_address + '/feedback#uninstall');
+  chrome.runtime.setUninstallURL(oabutton_site_address + '/feedback#uninstall');
 } catch(err) {}
 
 try {
   function instruct() {
-    chrome.tabs.create({'url': site_address + '/instructions'});
+    chrome.tabs.create({'url': oabutton_site_address + '/instructions'});
   }
   chrome.runtime.onInstalled.addListener(instruct);
 } catch(err) {}
