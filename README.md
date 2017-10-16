@@ -5,7 +5,7 @@ This is the Button's WebExtension which runs on Firefox and Chrome (and maybe Op
 
 ## Contributing
 
-Our [main repository](https:www.github.org/oabutton/backend) contains far more information on the project, how to contribute etc.
+Our [main repository](https:github.com/oabutton/backend) contains far more information on the project, how to contribute etc.
 
 Quick guide:
 
