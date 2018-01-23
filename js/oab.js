@@ -31,7 +31,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   if (debug === undefined) debug = true;
   if (bookmarklet === undefined) bookmarklet = false; // this script is also used by a bookmarklet, which sets this to a version to change plugin type
   if (debug) {
-    if (api_address === undefined) api_address = 'https://dev.api.cottagelabs.com/service/oab';
+    if (api_address === undefined) api_address = 'https://noddy.api.cottagelabs.com/service/oab'; //'https://dev.api.cottagelabs.com/service/oab';
     oabutton_site_address = 'https://dev.openaccessbutton.org';
   }
   if (api_address === undefined) api_address = 'https://api.openaccessbutton.org';
