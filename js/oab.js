@@ -66,7 +66,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
       document.getElementById('iconloading').style.display = 'none';
       document.getElementById('iserror').style.display = 'inline';
       document.getElementById('linkerror').setAttribute('href',redir);
-      document.getElementById('linkerror').click();
+      debug ? alert('Would auto-trigger link error click now if not in debug mode') : document.getElementById('linkerror').click();
     }
     if (chrome && chrome.tabs) chrome.tabs.create({'url': redir});
   }
@@ -79,7 +79,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
         if (bookmarklet) {
           document.getElementById('isopen').style.display = 'inline';
           document.getElementById('linkopen').setAttribute('href',avail_entry.url);
-          document.getElementById('linkopen').click();
+          debug ? alert('Would auto-trigger link open click now if not in debug mode') : document.getElementById('linkopen').click();
         }
         if (chrome && chrome.tabs) chrome.tabs.create({'url': avail_entry.url});
       }
@@ -89,7 +89,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
         if (bookmarklet) {
           document.getElementById('isclosed').style.display = 'inline';
           document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request/' + requests_entry._id);
-          document.getElementById('linkclosed').click();
+          debug ? alert('Would auto-trigger link closed click now if not in debug mode') : document.getElementById('linkclosed').click();
         }
         if (chrome && chrome.tabs) chrome.tabs.create({'url': oabutton_site_address + '/request/' + requests_entry._id});
       }
@@ -99,7 +99,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
         if (bookmarklet) {
           document.getElementById('isclosed').style.display = 'inline';
           document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request?url=' + encodeURIComponent(window.location.href));
-          document.getElementById('linkclosed').click();
+          debug ? alert('Would auto-trigger link closed click now if not in debug mode') : document.getElementById('linkclosed').click();
         }
         if (chrome && chrome.tabs) {
           chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
