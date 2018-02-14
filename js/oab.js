@@ -150,8 +150,8 @@ try {
       chrome.browserAction.setIcon({path:"../img/static_spin_orange_32.png"});
       oabutton_rotate_next = 1;
       oabutton_rotate();
-      //oabutton_ui();
-      oabutton_ui(true); // comment this out before going to live
+      oabutton_ui();
+      //oabutton_ui(true); // comment this out before going to live
     }
     chrome.browserAction.onClicked.addListener(execute);
   }
