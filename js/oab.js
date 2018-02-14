@@ -1,143 +1,169 @@
-/* Using the OAB API */
 
-var oab = {
+var oabutton_running = false;
+var oabutton_rotate_next = false;
 
-  debug : true, // this puts the button in debug mode, issues debug warnings
+var oabutton_site_address = 'https://openaccessbutton.org';
 
-  api_address : 'https://dev.api.cottagelabs.com/service/oab', // 'https://api.openaccessbutton.org',
+function oabutton_rotate() {
+  var path = '../img/static_spin_orange_32';
+  if (oabutton_rotate_next === 1) {
+    path += '_r1';
+    oabutton_rotate_next = 2;
+  } else if (oabutton_rotate_next === 2) {
+    path += '_r2';
+    oabutton_rotate_next = 0;
+  } else if (oabutton_rotate_next === 0) {
+    oabutton_rotate_next = 1;
+  }
+  path += '.png';
+  chrome.browserAction.setIcon({ path: path });
+  if (oabutton_rotate_next !== false) setTimeout(oabutton_rotate, 100);
+}
 
-  site_address : 'http://oab.test.cottagelabs.com', // 'https://openaccessbutton.org',
+var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
+  // don't do anything if already running, probably a user pressed the button twice in quick succession
+  if (oabutton_running) return;
+  oabutton_running = true;
 
-  howto_address : '/instructions',
+  // =============================================
+  // declare vars and functions
 
-  register_address : '/account',
+  //if (debug === undefined) debug = true;
+  if (bookmarklet === undefined) bookmarklet = false; // this script is also used by a bookmarklet, which sets this to a version to change plugin type
+  if (debug) {
+    if (api_address === undefined) api_address = 'https://noddy.api.cottagelabs.com/service/oab'; //'https://dev.api.cottagelabs.com/service/oab';
+    oabutton_site_address = 'https://dev.openaccessbutton.org';
+  }
+  if (api_address === undefined) api_address = 'https://api.openaccessbutton.org';
+  if (site_address !== undefined)  oabutton_site_address = site_address;
 
-  bug_address : '/bug',
-
-  messages: 'message', // a div ID name to put error messages etc
-
-  // Tell the API which plugin version is in use for each POST
-  signPluginVersion: function(data) {
-    // Add the debug key if turned on
+  function availability(data) {
     try {
       var manifest = chrome.runtime.getManifest();
       data.plugin = manifest.version_name;
     } catch (err) {
-      data.plugin = 'oab_test_page';
+      data.plugin = bookmarklet ? 'bookmarklet_'+bookmarklet : 'oab_test_page';
     }
-    if (oab.debug) data.test = true;
-    return data;
-  },
-
-  sendAvailabilityQuery: function(api_key, url, success_callback, failure_callback) {
-    oab.postLocated('/availability', api_key, { url: url }, success_callback, failure_callback)
-  },
-
-  sendRequestPost: function(api_key, data, success_callback, failure_callback) {
-    var request_id = data._id ? data._id : '';
-    oab.postLocated('/request/' + request_id, api_key, data, success_callback, failure_callback)
-  },
-
-  sendSupportPost: function(api_key, data, success_callback, failure_callback) {
-    var request_id = data._id ? data._id : undefined;
-    if ( request_id ) {
-      oab.postLocated('/support/' + request_id, api_key, data, success_callback, failure_callback);
-    } else {
-      // refuse to send
-      oab.debugLog('Not sending support post without request ID');
-    }
-  },
-
-  // try to append location to the data object before POST
-  postLocated: function(request_type,key,data,success_callback,error_callback) {
-    try {
-      if (navigator.geolocation) {
-        var opts = {timeout: 5000};
-        navigator.geolocation.getCurrentPosition(function (position) {
-          data.location = {geo: {lat: position.coords.latitude, lon: position.coords.longitude}};
-          oab.postToAPI(request_type,key,data,success_callback,error_callback);
-        }, function (error) {
-          oab.debugLog(error.message);
-          oab.postToAPI(request_type,key,data,success_callback,error_callback);
-        }, opts);
-      } else {
-        // Browser does not support location
-        oab.debugLog('GeoLocation is unsupported.');
-        oab.postToAPI(request_type,key,data,success_callback,error_callback);
-      }
-    } catch (e) {
-      oab.debugLog("A location error has occurred.");
-      oab.postToAPI(request_type,key,data,success_callback,error_callback);
-    }
-  },
-
-  postToAPI: function(request_type, api_key, data, success_callback, failure_callback) {
+    if (debug) data.test = true;
     var http = new XMLHttpRequest();
-    var url = oab.api_address + request_type;
+    var url = api_address + '/availability';
     http.open("POST", url, true);
     http.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    if (api_key !== undefined) http.setRequestHeader("x-apikey", api_key);
     http.onreadystatechange = function() {
       if (http.readyState == XMLHttpRequest.DONE) {
-        http.status === 200 ? success_callback(JSON.parse(http.response)) : failure_callback(http);
+        oabutton_running = false;
+        http.status === 200 ? display(JSON.parse(http.response)) : error(http);
       }
     }
-    http.send(JSON.stringify(this.signPluginVersion(data)));
-    oab.debugLog('POST to ' + request_type + ' ' + JSON.stringify(data));
-  },
+    http.send(JSON.stringify(data));
+  }
 
-  displayMessage: function(msg, div, type) {
-    if (div === undefined) div = document.getElementById(oab.messages);
-    if (type === undefined) {
-      type = '';
-    } else if ( type === 'error' ) {
-      type = 'alert-danger';
+  function error(data) {
+    var code = data.response && data.response.code ? data.response.code : data.status;
+    if (debug) console.log(data);
+    var redir = code === 400 ? oabutton_site_address + '/instructions#blacklist' : oabutton_site_address + '/feedback?code=' + code;
+    if (bookmarklet) {
+      document.getElementById('iconloading').style.display = 'none';
+      document.getElementById('iserror').style.display = 'inline';
+      document.getElementById('linkerror').setAttribute('href',redir);
+      debug ? alert('Would auto-trigger link error click now if not in debug mode') : document.getElementById('linkerror').click();
     }
-    div.innerHTML = '<div class="alert ' + type + '" role="alert">' + msg + '</div>';
-  },
+    if (chrome && chrome.tabs) chrome.tabs.create({'url': redir});
+  }
 
-  handleAPIError: function(data, displayError) {
-    document.getElementById('icon_submitting').className = 'collapse';
-    document.getElementById('icon_loading').className = 'collapse';
-    var error_text = '';
-    if (data.status === 400) {
-      error_text = 'Sorry, the Button does not work on pages like this. You might want to check the <a href="' + oab.site_address + oab.howto_address + '" id="goto_instructions">instructions</a> for help. If you think it should work here, <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
-    } else if (data.status === 401) {
-      error_text = "You need an account for this. Go to ";
-      error_text += '<a href="' + oab.site_address + oab.register_address + '" id="goto_register">';
-      error_text += oab.site_address + oab.register_address + "</a> and either sign up or sign in - then your plugin will work.";
-    } else if (data.status === 403) {
-      error_text = 'Something is wrong, please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
-    } else {
-      error_text = data.status + '. Hmm, we are not sure what is happening. You or the system may be offline. Please <a id="goto_bug" href="' + oab.site_address + oab.bug_address + '">file a bug</a>.';
+  function display(response) {
+    if (debug) console.log('API response: ' + JSON.stringify(response.data));
+    if (bookmarklet) document.getElementById('iconloading').style.display = 'none';
+    for ( var avail_entry of response.data.availability ) {
+      if (avail_entry.type === 'article') {
+        if (bookmarklet) {
+          document.getElementById('isopen').style.display = 'inline';
+          document.getElementById('linkopen').setAttribute('href',avail_entry.url);
+          debug ? alert('Would auto-trigger link open click now if not in debug mode') : document.getElementById('linkopen').click();
+        }
+        if (chrome && chrome.tabs) chrome.tabs.create({'url': avail_entry.url});
+      }
     }
-    if (error_text !== '') {
-      error_text = '<p><img src="../img/error.png" style="margin:5px auto 10px 100px;"></p>' + error_text;
-      document.getElementById('loading_area').className = 'row collapse';
-      oab.displayMessage(error_text, undefined, 'error');
-      if (chrome && chrome.tabs) {
-        if ( document.getElementById('goto_instructions') ) {
-          document.getElementById('goto_instructions').onclick = function () {
-            chrome.tabs.create({'url': oab.site_address + oab.howto_address});
-          };
+    for (var requests_entry of response.data.requests) {
+      if (requests_entry.type === 'article') {
+        if (bookmarklet) {
+          document.getElementById('isclosed').style.display = 'inline';
+          document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request/' + requests_entry._id);
+          debug ? alert('Would auto-trigger link closed click now if not in debug mode') : document.getElementById('linkclosed').click();
         }
-        if ( document.getElementById('goto_bug') ) {
-          document.getElementById('goto_bug').onclick = function () {
-            chrome.tabs.create({'url': oab.site_address + oab.bug_address});
-          };
+        if (chrome && chrome.tabs) chrome.tabs.create({'url': oabutton_site_address + '/request/' + requests_entry._id});
+      }
+    }
+    for (var accepts_entry of response.data.accepts) {
+      if (accepts_entry.type === 'article') {
+        if (bookmarklet) {
+          document.getElementById('isclosed').style.display = 'inline';
+          document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request?url=' + encodeURIComponent(window.location.href));
+          debug ? alert('Would auto-trigger link closed click now if not in debug mode') : document.getElementById('linkclosed').click();
         }
-        if ( document.getElementById('goto_register') ) {
-          document.getElementById('goto_register').onclick = function () {
-            chrome.tabs.create({'url': oab.site_address + oab.register_address});
-          };
+        if (chrome && chrome.tabs) {
+          chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+            chrome.tabs.create({'url': oabutton_site_address + '/request?url=' + encodeURIComponent(tabs[0].url)});
+          });
         }
       }
     }
-  },
+    try {
+      if (chrome && chrome.browserAction) {
+        oabutton_rotate_next = false;
+        setTimeout(function() {
+          chrome.browserAction.setIcon({path:"../img/oa128.png"});
+        },1000);
+      }
+    } catch(err) {}
+  }
 
-  debugLog: function(message) {
-    if (oab.debug) {
-      console.log(message)
+  try {
+    chrome.storage.local.remove(['dom'],function() {
+      chrome.tabs.executeScript({
+        code: 'chrome.storage.local.set({dom: document.all[0].outerHTML });'
+      },function() {
+        chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+          var qry = {url:tabs[0].url.split('#')[0]};
+          try {
+            chrome.storage.local.get({dom : ''}, function(items) {
+              if (items.dom !== '') qry.dom = items.dom;
+              availability(qry);
+            });
+          } catch (err) {
+            availability(qry);
+          }
+        });
+      });
+    });
+  } catch (err) {
+    if (bookmarklet) {
+      if (debug) console.log('Sending availability query direct from within page');
+      availability({url:window.location.href.split('#')[0], dom: document.all[0].outerHTML});
     }
   }
 };
+
+try {
+  if (chrome && chrome.browserAction) {
+    function execute() {
+      chrome.browserAction.setIcon({path:"../img/static_spin_orange_32.png"});
+      oabutton_rotate_next = 1;
+      oabutton_rotate();
+      //oabutton_ui();
+      oabutton_ui(true); // comment this out before going to live
+    }
+    chrome.browserAction.onClicked.addListener(execute);
+  }
+} catch(err) {}
+
+try {
+  chrome.runtime.setUninstallURL(oabutton_site_address + '/feedback#uninstall');
+} catch(err) {}
+
+try {
+  function instruct() {
+    chrome.tabs.create({'url': oabutton_site_address + '/instructions'});
+  }
+  chrome.runtime.onInstalled.addListener(instruct);
+} catch(err) {}
