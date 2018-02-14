@@ -27,8 +27,8 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
 
   // =============================================
   // declare vars and functions
-  
-  if (debug === undefined) debug = true;
+
+  //if (debug === undefined) debug = true;
   if (bookmarklet === undefined) bookmarklet = false; // this script is also used by a bookmarklet, which sets this to a version to change plugin type
   if (debug) {
     if (api_address === undefined) api_address = 'https://noddy.api.cottagelabs.com/service/oab'; //'https://dev.api.cottagelabs.com/service/oab';
@@ -150,7 +150,8 @@ try {
       chrome.browserAction.setIcon({path:"../img/static_spin_orange_32.png"});
       oabutton_rotate_next = 1;
       oabutton_rotate();
-      oabutton_ui();
+      //oabutton_ui();
+      oabutton_ui(true); // comment this out before going to live
     }
     chrome.browserAction.onClicked.addListener(execute);
   }
