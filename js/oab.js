@@ -31,7 +31,7 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
   //if (debug === undefined) debug = true;
   if (bookmarklet === undefined) bookmarklet = false; // this script is also used by a bookmarklet, which sets this to a version to change plugin type
   if (debug) {
-    if (api_address === undefined) api_address = 'https://noddy.api.cottagelabs.com/service/oab'; //'https://dev.api.cottagelabs.com/service/oab';
+    if (api_address === undefined) api_address = 'https://dev.api.cottagelabs.com/service/oab';
     oabutton_site_address = 'https://dev.openaccessbutton.org';
   }
   if (api_address === undefined) api_address = 'https://api.openaccessbutton.org';
@@ -98,14 +98,10 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
       if (accepts_entry.type === 'article') {
         if (bookmarklet) {
           document.getElementById('isclosed').style.display = 'inline';
-          document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request?url=' + encodeURIComponent(window.location.href));
+          document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request?url=' + encodeURIComponent(window.location.href) + (window.location.href.indexOf('eu.alma.exlibrisgroup.com') !== -1 && response.data.meta && response.data.meta.article && response.data.meta.article.title ? '&title=' + response.data.meta.article.title : ''));
           debug ? alert('Would auto-trigger link closed click now if not in debug mode') : document.getElementById('linkclosed').click();
         }
-        if (chrome && chrome.tabs) {
-          chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-            chrome.tabs.create({'url': oabutton_site_address + '/request?url=' + encodeURIComponent(tabs[0].url)});
-          });
-        }
+        chrome.tabs.create({'url': oabutton_site_address + '/request?url=' + encodeURIComponent(response.data.match) + (response.data.match.indexOf('eu.alma.exlibrisgroup.com') !== -1 && response.data.meta && response.data.meta.article && response.data.meta.article.title ? '&title=' + response.data.meta.article.title : '')});
       }
     }
     try {
