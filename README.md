@@ -48,3 +48,11 @@ Pre-releases are on dev, other releases are on live.
 * Click the newly appeared 'Load unpacked extension...' button
 * Browse to the project directory you just downloaded, click 'Select'. It will upload the zip file you just downloaded.
 * If you're experiencing problems with any of these steps, feel free to leave an issue on the discussion repository [here](https://github.com/OAButton/discussion/issues/new).
+
+## Managing releases 
+
+* Only releases tagged "Release" can be put in the Chrome Store. Anything tagged "pre-release" will only work in development. Any time we want to release something new out to chrome, it will always be the latest live release that can be pushed to the chrome store. 
+* Releases can be made through the Chrome store here: https://chrome.google.com/webstore/category/extensions while logged into the leads Open Access Button Account. 
+* Releases should be tested on master, just in case, after release. 
+* Releases tagged pre-release will increment whenever we push new features/fixes etc, and the most recent pre-release should be used for testing, then once testing is confirmed, we will make a live release.
+* Firefox packages are similar - ones in pre-release on dev will connect to the dev API. Live releases, on master, will connect to the live API
