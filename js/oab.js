@@ -96,12 +96,19 @@ var oabutton_ui = function(debug,bookmarklet,api_address,site_address) {
     }
     for (var accepts_entry of response.data.accepts) {
       if (accepts_entry.type === 'article') {
+        var mu = bookmarklet ? window.location.href : response.data.match;
+        var rurl = oabutton_site_address + '/request?url=' + encodeURIComponent(mu);
+        if (response.data.exlibris && response.data.meta && response.data.meta.article) {
+          if (response.data.meta.article.title) rurl += '&title=' + response.data.meta.article.title;
+          if (response.data.meta.article.doi) rurl += '&doi=' + response.data.meta.article.doi;
+          rurl += '&exlibris=true';
+        }
         if (bookmarklet) {
           document.getElementById('isclosed').style.display = 'inline';
-          document.getElementById('linkclosed').setAttribute('href',oabutton_site_address + '/request?url=' + encodeURIComponent(window.location.href) + (window.location.href.indexOf('eu.alma.exlibrisgroup.com') !== -1 && response.data.meta && response.data.meta.article && response.data.meta.article.title ? '&title=' + response.data.meta.article.title : ''));
+          document.getElementById('linkclosed').setAttribute('href',rurl);
           debug ? alert('Would auto-trigger link closed click now if not in debug mode') : document.getElementById('linkclosed').click();
         }
-        chrome.tabs.create({'url': oabutton_site_address + '/request?url=' + encodeURIComponent(response.data.match) + (response.data.match.indexOf('eu.alma.exlibrisgroup.com') !== -1 && response.data.meta && response.data.meta.article && response.data.meta.article.title ? '&title=' + response.data.meta.article.title : '')});
+        chrome.tabs.create({'url': rurl});
       }
     }
     try {
