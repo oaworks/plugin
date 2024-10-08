@@ -13,10 +13,8 @@
     "default_title": "Open Access Button",
     "default_icon": "img/oa128.png"
   },
-  "host_permissions": ["*://*/*"],
   "permissions": [
-    "webNavigation",
-    "scripting",
-    "activeTab"
+    "activeTab",
+    "scripting"
   ]
 }
